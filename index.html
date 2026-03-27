@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Chat Rekber</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: #000;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* LOGIN PAGE */
+        #login-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .role-select {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .role-btn {
+            padding: 15px 30px;
+            border: 2px solid #333;
+            background: #1C1C1E;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .role-btn:hover {
+            border-color: #3390EC;
+        }
+
+        .role-btn.active {
+            background: #3390EC;
+            border-color: #3390EC;
+        }
+
+        input {
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #1C1C1E;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3390EC;
+        }
+
+        .enter-btn {
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            background: #3390EC;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .enter-btn:disabled {
+            background: #333;
+            color: #666;
+        }
+
+        /* CHAT PAGE */
+        #chat-page {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: #1C1C1E;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #333;
+        }
+
+        .chat-header .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #3390EC;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .chat-header .info {
+            flex: 1;
+        }
+
+        .chat-header .name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .chat-header .status {
+            font-size: 12px;
+            color: #8E8E93;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #3390EC;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            background: #0f0f0f;
+        }
+
+        .message {
+            max-width: 80%;
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            border-radius: 16px;
+            font-size: 15px;
+            line-height: 1.3;
+            position: relative;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* PENTING: Style untuk masing-masing role */
+        
+        /* Admin = Biru, kanan */
+        .message.admin {
+            align-self: flex-end;
+            background: #3390EC;
+            color: white;
+            border-bottom-right-radius: 4px;
+            margin-left: auto;
+        }
+
+        /* Buyer = Abu, kiri */
+        .message.buyer {
+            align-self: flex-start;
+            background: #2C2C2E;
+            color: white;
+            border-bottom-left-radius: 4px;
+            margin-right: auto;
+        }
+
+        /* Seller = Hijau, kiri */
+        .message.seller {
+            align-self: flex-start;
+            background: #1C3A1C;
+            color: #4CD964;
+            border-bottom-left-radius: 4px;
+            margin-right: auto;
+        }
+
+        .message .sender {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .message .time {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-left: 8px;
+            float: right;
+        }
+
+        .input-area {
+            background: #1C1C1E;
+            padding: 8px 12px 24px;
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid #333;
+        }
+
+        .input-area input {
+            flex: 1;
+            margin: 0;
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            background: #3390EC;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        /* Test info */
+        .test-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        .test-info button {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+            padding: 8px;
+            background: #333;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .test-info button:hover {
+            background: #444;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TEST PANEL (Untuk ganti role cepat) -->
+    <div class="test-info">
+        <div style="margin-bottom: 8px; color: #8E8E93;">Test Panel:</div>
+        <button onclick="setTestRole('admin')">Jadi Admin</button>
+        <button onclick="setTestRole('buyer')">Jadi Buyer</button>
+        <button onclick="setTestRole('seller')">Jadi Seller</button>
+        <div id="current-role" style="margin-top: 8px; color: #3390EC;">Role: -</div>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="login-page">
+        <h2 style="margin-bottom: 20px;">Pilih Role</h2>
+        
+        <div class="role-select">
+            <button class="role-btn" onclick="selectRole('admin')">Admin</button>
+            <button class="role-btn" onclick="selectRole('buyer')">Buyer</button>
+            <button class="role-btn" onclick="selectRole('seller')">Seller</button>
+        </div>
+
+        <input type="text" id="username" placeholder="Nama Anda" oninput="checkInput()">
+        <input type="text" id="room-code" placeholder="Kode Room (6 digit)" maxlength="6">
+        
+        <button class="enter-btn" id="enter-btn" onclick="enterChat()" disabled>Masuk Chat</button>
+    </div>
+
+    <!-- CHAT PAGE -->
+    <div id="chat-page">
+        <div class="chat-header">
+            <button class="back-btn" onclick="backToLogin()">‹ Back</button>
+            <div class="avatar" id="header-avatar">A</div>
+            <div class="info">
+                <div class="name" id="header-name">Room</div>
+                <div class="status" id="header-status">online</div>
+            </div>
+        </div>
+
+        <div class="messages" id="messages"></div>
+
+        <div class="input-area">
+            <input type="text" id="message-input" placeholder="Pesan..." onkeypress="if(event.key==='Enter')sendMessage()">
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <!-- FIREBASE -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyDpQhIcitZwMMhQIHhpB9rp_k0EpBJT-2k",
+            authDomain: "chat-real-time-32576.firebaseapp.com",
+            databaseURL: "https://chat-real-time-32576-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "chat-real-time-32576",
+            storageBucket: "chat-real-time-32576.appspot.com",
+            messagingSenderId: "21431357525",
+            appId: "1:21431357525:web:5a32eb1ae3f59a485e04dc"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // STATE
+        let currentRole = '';
+        let currentName = '';
+        let currentRoom = '';
+        let messageListener = null;
+
+        // PILIH ROLE
+        function selectRole(role) {
+            currentRole = role;
+            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Auto isi nama berdasarkan role
+            const nameInput = document.getElementById('username');
+            if(role === 'admin') nameInput.value = 'AryanzUtama';
+            
+            checkInput();
+            updateTestPanel();
+        }
+
+        function checkInput() {
+            const name = document.getElementById('username').value;
+            const room = document.getElementById('room-code').value;
+            document.getElementById('enter-btn').disabled = !(currentRole && name && room.length === 6);
+        }
+
+        // ENTER CHAT
+        function enterChat() {
+            currentName = document.getElementById('username').value || currentRole;
+            currentRoom = document.getElementById('room-code').value;
+            
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('chat-page').style.display = 'flex';
+            
+            // Setup header
+            document.getElementById('header-avatar').textContent = currentRole[0].toUpperCase();
+            document.getElementById('header-name').textContent = `Room ${currentRoom} (${currentRole})`;
+            document.getElementById('header-status').textContent = `as ${currentName}`;
+            
+            // Listen messages
+            listenMessages();
+            
+            updateTestPanel();
+        }
+
+        // LISTEN MESSAGES
+        function listenMessages() {
+            if(messageListener) {
+                db.ref('test-rooms/' + currentRoom).off('child_added', messageListener);
+            }
+            
+            document.getElementById('messages').innerHTML = '';
+            
+            messageListener = db.ref('test-rooms/' + currentRoom).on('child_added', snapshot => {
+                const msg = snapshot.val();
+                displayMessage(msg);
+            });
+        }
+
+        // DISPLAY MESSAGE - INI YANG PENTING!
+        function displayMessage(msg) {
+            const container = document.getElementById('messages');
+            const div = document.createElement('div');
+            
+            // TENTUKAN CLASS BERDASARKAN ROLE PENGIRIM
+            // Bukan berdasarkan siapa yang lihat, tapi siapa yang kirim!
+            div.className = 'message ' + msg.role; // admin / buyer / seller
+            
+            const time = new Date(msg.timestamp).toLocaleTimeString('id-ID', {
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+            
+            div.innerHTML = `
+                <div class="sender">${msg.name} (${msg.role})</div>
+                ${msg.text}
+                <span class="time">${time}</span>
+            `;
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // SEND MESSAGE
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            if(!text) return;
+            
+            // KIRIM DENGAN ROLE YANG JELAS
+            db.ref('test-rooms/' + currentRoom).push({
+                role: currentRole,      // 'admin', 'buyer', atau 'seller'
+                name: currentName,      // nama user
+                text: text,
+                timestamp: Date.now()
+            });
+            
+            input.value = '';
+        }
+
+        // BACK
+        function backToLogin() {
+            if(messageListener) {
+                db.ref('test-rooms/' + currentRoom).off('child_added', messageListener);
+            }
+            document.getElementById('chat-page').style.display = 'none';
+            document.getElementById('login-page').style.display = 'flex';
+        }
+
+        // TEST PANEL - GANTI ROLE CEPAT
+        function setTestRole(role) {
+            currentRole = role;
+            currentName = role === 'admin' ? 'AryanzUtama' : role + '_' + Math.floor(Math.random()*1000);
+            document.getElementById('room-code').value = currentRoom || '123456';
+            enterChat();
+        }
+
+        function updateTestPanel() {
+            document.getElementById('current-role').textContent = `Role: ${currentRole || '-'}`;
+        }
+
+        // INIT
+        document.getElementById('room-code').value = '123456';
+    </script>
+</body>
+</html>
