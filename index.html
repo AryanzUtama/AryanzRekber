@@ -2,317 +2,1709 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Chat Rekber</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rekber MC - AryanzUtama</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-gray: #8E8E93;
+            --ios-bg: #000;
+            --ios-card: rgba(28,28,30,0.95);
+            --ios-border: rgba(255,255,255,0.1);
+            --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --smooth: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
-            background: #000;
+            background: var(--ios-bg);
             color: white;
-            height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
-        /* LOGIN PAGE */
-        #login-page {
+        /* PAGE TRANSITIONS */
+        .page {
+            display: none;
+            min-height: 100vh;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s var(--smooth);
+        }
+
+        .page.active-page {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* BANNER */
+        .banner-wrap {
+            position: relative;
+            height: 260px;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .banner-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.4);
+            animation: kenBurns 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes kenBurns {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .banner-dark {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 100%);
+        }
+
+        .banner-text {
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            animation: slideUp 0.6s var(--spring) 0.2s both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .banner-text h1 {
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+        }
+
+        .banner-text p {
+            opacity: 0.9;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .home-body {
+            padding: 0 20px 100px;
+            margin-top: -40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* PROFILE */
+        .profile-box {
+            background: var(--ios-card);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            border: 1px solid var(--ios-border);
+            animation: slideUp 0.5s var(--spring) 0.1s both;
+            transition: transform 0.3s;
+        }
+
+        .profile-box:active {
+            transform: scale(0.98);
+        }
+
+        .prof-ava {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .prof-info h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .verif-badge {
+            background: rgba(52,199,89,0.2);
+            color: var(--ios-green);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* MENU */
+        .menu-box {
+            margin-bottom: 24px;
+            animation: slideUp 0.5s var(--spring) 0.2s both;
+        }
+
+        .menu-label {
+            font-size: 12px;
+            color: var(--ios-gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            margin-left: 4px;
+            font-weight: 600;
+        }
+
+        .menu-item {
+            width: 100%;
+            background: var(--ios-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: white;
+            cursor: pointer;
+            border: 1px solid var(--ios-border);
+            transition: all 0.3s var(--spring);
+            animation: slideUp 0.5s var(--spring) both;
+        }
+
+        .menu-item:nth-child(2) { animation-delay: 0.3s; }
+        .menu-item:nth-child(3) { animation-delay: 0.4s; }
+
+        .menu-item:active {
+            transform: scale(0.96);
+        }
+
+        .menu-item.buyer { border-left: 3px solid var(--ios-blue); }
+        .menu-item.seller { border-left: 3px solid var(--ios-green); }
+
+        .item-icon {
+            font-size: 28px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            padding: 20px;
         }
 
-        .role-select {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+        .item-text {
+            flex: 1;
         }
 
-        .role-btn {
-            padding: 15px 30px;
-            border: 2px solid #333;
-            background: #1C1C1E;
-            color: white;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s;
-        }
-
-        .role-btn:hover {
-            border-color: #3390EC;
-        }
-
-        .role-btn.active {
-            background: #3390EC;
-            border-color: #3390EC;
-        }
-
-        input {
-            width: 100%;
-            max-width: 300px;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: #1C1C1E;
-            border: 1px solid #333;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #3390EC;
-        }
-
-        .enter-btn {
-            width: 100%;
-            max-width: 300px;
-            padding: 15px;
-            background: #3390EC;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
+        .item-text b {
+            display: block;
+            font-size: 18px;
             font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .item-text span {
+            font-size: 14px;
+            color: var(--ios-gray);
+        }
+
+        .item-arrow {
+            font-size: 24px;
+            color: var(--ios-gray);
+        }
+
+        /* STATS */
+        .stats-box {
+            background: var(--ios-card);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border: 1px solid var(--ios-border);
+            animation: slideUp 0.5s var(--spring) 0.5s both;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat b {
+            display: block;
+            font-size: 24px;
+            color: var(--ios-blue);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat span {
+            font-size: 11px;
+            color: var(--ios-gray);
+            text-transform: uppercase;
+        }
+
+        .stat-line {
+            width: 1px;
+            height: 40px;
+            background: var(--ios-border);
+        }
+
+        /* FOOTER */
+        .powered {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: var(--ios-gray);
+            font-size: 12px;
+            letter-spacing: 2px;
             cursor: pointer;
-            margin-top: 10px;
+            padding: 16px;
+            transition: all 0.3s;
         }
 
-        .enter-btn:disabled {
-            background: #333;
-            color: #666;
+        .powered:active {
+            color: white;
         }
 
-        /* CHAT PAGE */
-        #chat-page {
-            display: none;
-            height: 100vh;
-            flex-direction: column;
-        }
-
-        .chat-header {
-            background: #1C1C1E;
+        /* NAV */
+        .nav-bar {
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
             padding: 12px 16px;
             display: flex;
             align-items: center;
             gap: 12px;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid var(--ios-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .chat-header .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #3390EC;
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--ios-blue);
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .nav-bar span {
+            flex: 1;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* FORMS */
+        .form-wrap {
+            padding: 24px 16px;
+            min-height: calc(100vh - 50px);
+        }
+
+        .form-head {
+            text-align: center;
+            margin-bottom: 32px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .form-icon {
+            font-size: 56px;
+            margin-bottom: 12px;
+            animation: bounceIn 0.6s var(--spring);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.95); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .form-head h2 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .input-box {
+            margin-bottom: 20px;
+            animation: slideUp 0.4s var(--spring) both;
+        }
+
+        .input-box:nth-child(2) { animation-delay: 0.1s; }
+        .input-box:nth-child(3) { animation-delay: 0.2s; }
+        .input-box:nth-child(4) { animation-delay: 0.3s; }
+
+        .input-box label {
+            display: block;
+            font-size: 12px;
+            color: var(--ios-gray);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 16px;
+            background: var(--ios-card);
+            border: 1px solid var(--ios-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-box input:focus {
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 3px rgba(0,122,255,0.2);
+        }
+
+        .uang-text {
+            color: var(--ios-green);
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .type-btns {
+            display: flex;
+            gap: 12px;
+        }
+
+        .t-btn {
+            flex: 1;
+            padding: 16px;
+            background: var(--ios-card);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .t-btn.aktif {
+            border-color: var(--ios-blue);
+            color: var(--ios-blue);
+        }
+
+        .main-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--ios-blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s;
+        }
+
+        .main-btn:disabled {
+            background: #333;
+            color: #666;
+        }
+
+        .main-btn.green { background: var(--ios-green); }
+        .main-btn.red { background: var(--ios-red); }
+        .main-btn.small {
+            width: auto;
+            padding: 10px 16px;
+            font-size: 14px;
+        }
+
+        .hasil-box {
+            margin-top: 24px;
+            background: rgba(52,199,89,0.1);
+            border: 2px dashed var(--ios-green);
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            animation: slideUp 0.5s var(--spring);
+        }
+
+        .kode-label {
+            font-size: 12px;
+            color: var(--ios-gray);
+            margin-bottom: 8px;
+        }
+
+        .kode-angka {
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: 8px;
+            font-family: monospace;
+            color: var(--ios-green);
+            margin-bottom: 20px;
+        }
+
+        .copy-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        /* ADMIN */
+        .admin-bg {
+            background: var(--ios-bg);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 20px;
+            min-height: 100vh;
         }
 
-        .chat-header .info {
-            flex: 1;
+        .admin-modal {
+            background: var(--ios-card);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px 28px;
+            width: 100%;
+            max-width: 340px;
+            text-align: center;
+            border: 1px solid var(--ios-border);
+            animation: scaleIn 0.5s var(--spring);
         }
 
-        .chat-header .name {
-            font-size: 16px;
-            font-weight: 600;
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
-        .chat-header .status {
-            font-size: 12px;
-            color: #8E8E93;
+        .adm-icon {
+            font-size: 56px;
+            margin-bottom: 20px;
         }
 
-        .back-btn {
-            background: none;
-            border: none;
-            color: #3390EC;
-            font-size: 16px;
-            cursor: pointer;
+        .admin-modal h3 {
+            margin-bottom: 24px;
+            font-size: 22px;
         }
 
-        .messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px;
-            background: #0f0f0f;
-        }
-
-        .message {
-            max-width: 80%;
-            margin-bottom: 8px;
-            padding: 8px 12px;
-            border-radius: 16px;
-            font-size: 15px;
-            line-height: 1.3;
-            position: relative;
-            animation: fadeIn 0.2s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* PENTING: Style untuk masing-masing role */
-        
-        /* Admin = Biru, kanan */
-        .message.admin {
-            align-self: flex-end;
-            background: #3390EC;
-            color: white;
-            border-bottom-right-radius: 4px;
-            margin-left: auto;
-        }
-
-        /* Buyer = Abu, kiri */
-        .message.buyer {
-            align-self: flex-start;
-            background: #2C2C2E;
-            color: white;
-            border-bottom-left-radius: 4px;
-            margin-right: auto;
-        }
-
-        /* Seller = Hijau, kiri */
-        .message.seller {
-            align-self: flex-start;
-            background: #1C3A1C;
-            color: #4CD964;
-            border-bottom-left-radius: 4px;
-            margin-right: auto;
-        }
-
-        .message .sender {
-            font-size: 11px;
-            opacity: 0.7;
-            margin-bottom: 2px;
-            font-weight: 600;
-        }
-
-        .message .time {
-            font-size: 11px;
-            opacity: 0.6;
-            margin-left: 8px;
-            float: right;
-        }
-
-        .input-area {
-            background: #1C1C1E;
-            padding: 8px 12px 24px;
-            display: flex;
-            gap: 8px;
-            border-top: 1px solid #333;
-        }
-
-        .input-area input {
-            flex: 1;
-            margin: 0;
-        }
-
-        .send-btn {
-            width: 44px;
-            height: 44px;
-            background: #3390EC;
-            border: none;
-            border-radius: 50%;
+        .admin-modal input {
+            width: 100%;
+            padding: 16px;
+            background: var(--ios-card);
+            border: 1px solid var(--ios-border);
+            border-radius: 12px;
             color: white;
             font-size: 18px;
-            cursor: pointer;
+            text-align: center;
+            margin-bottom: 20px;
         }
 
-        /* Test info */
-        .test-info {
+        .batal-btn {
+            background: none;
+            border: none;
+            color: var(--ios-blue);
+            margin-top: 16px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .admin-container {
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .realtime-indicator {
             position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.8);
-            padding: 10px;
+            top: 60px;
+            right: 16px;
+            background: var(--ios-green);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .room-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 40px;
+        }
+
+        .room-item {
+            background: var(--ios-card);
+            padding: 16px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--ios-border);
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .room-info b { color: var(--ios-blue); font-size: 16px; display: block; margin-bottom: 4px; }
+        .room-info span { color: var(--ios-green); font-size: 14px; display: block; margin-bottom: 2px; }
+        .room-info small { color: var(--ios-gray); font-size: 12px; }
+
+        .room-actions {
+            display: flex;
+            gap: 8px;
+            flex-direction: column;
+        }
+
+        .delete-btn {
+            background: rgba(255,59,48,0.2);
+            color: var(--ios-red);
+            border: none;
+            padding: 8px 12px;
             border-radius: 8px;
             font-size: 12px;
-            z-index: 1000;
-        }
-
-        .test-info button {
-            display: block;
-            width: 100%;
-            margin-bottom: 5px;
-            padding: 8px;
-            background: #333;
-            border: none;
-            color: white;
-            border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
-        }
-
-        .test-info button:hover {
-            background: #444;
         }
     </style>
 </head>
 <body>
 
-    <!-- TEST PANEL (Untuk ganti role cepat) -->
-    <div class="test-info">
-        <div style="margin-bottom: 8px; color: #8E8E93;">Test Panel:</div>
-        <button onclick="setTestRole('admin')">Jadi Admin</button>
-        <button onclick="setTestRole('buyer')">Jadi Buyer</button>
-        <button onclick="setTestRole('seller')">Jadi Seller</button>
-        <div id="current-role" style="margin-top: 8px; color: #3390EC;">Role: -</div>
-    </div>
-
-    <!-- LOGIN PAGE -->
-    <div id="login-page">
-        <h2 style="margin-bottom: 20px;">Pilih Role</h2>
-        
-        <div class="role-select">
-            <button class="role-btn" onclick="selectRole('admin')">Admin</button>
-            <button class="role-btn" onclick="selectRole('buyer')">Buyer</button>
-            <button class="role-btn" onclick="selectRole('seller')">Seller</button>
-        </div>
-
-        <input type="text" id="username" placeholder="Nama Anda" oninput="checkInput()">
-        <input type="text" id="room-code" placeholder="Kode Room (6 digit)" maxlength="6">
-        
-        <button class="enter-btn" id="enter-btn" onclick="enterChat()" disabled>Masuk Chat</button>
-    </div>
-
-    <!-- CHAT PAGE -->
-    <div id="chat-page">
-        <div class="chat-header">
-            <button class="back-btn" onclick="backToLogin()">‹ Back</button>
-            <div class="avatar" id="header-avatar">A</div>
-            <div class="info">
-                <div class="name" id="header-name">Room</div>
-                <div class="status" id="header-status">online</div>
+    <!-- PAGE 1: HOME -->
+    <div id="page-home" class="page active-page">
+        <div class="banner-wrap">
+            <img src="https://res.cloudinary.com/dtdodhqqi/image/upload/v1766772767/IMG-20251128-WA0091_ldbe9l.jpg" class="banner-img">
+            <div class="banner-dark"></div>
+            <div class="banner-text">
+                <h1>Rekber MC</h1>
+                <p>Transaksi Aman & Terpercaya</p>
             </div>
         </div>
 
-        <div class="messages" id="messages"></div>
+        <div class="home-body">
+            <div class="profile-box">
+                <img src="https://res.cloudinary.com/dtdodhqqi/image/upload/v1766845910/IMG-20251128-WA0094_1_rrrhdn.jpg" class="prof-ava">
+                <div class="prof-info">
+                    <h2>AryanzUtama</h2>
+                    <span class="verif-badge">✓ Verified</span>
+                </div>
+            </div>
 
-        <div class="input-area">
-            <input type="text" id="message-input" placeholder="Pesan..." onkeypress="if(event.key==='Enter')sendMessage()">
-            <button class="send-btn" onclick="sendMessage()">➤</button>
+            <div class="menu-box">
+                <p class="menu-label">Pilih Peran</p>
+                
+                <button class="menu-item buyer" onclick="goBuyer()">
+                    <div class="item-icon">🛒</div>
+                    <div class="item-text"><b>Buyer</b><span>Pembeli</span></div>
+                    <div class="item-arrow">›</div>
+                </button>
+
+                <button class="menu-item seller" onclick="goSeller()">
+                    <div class="item-icon">🏪</div>
+                    <div class="item-text"><b>Seller</b><span>Penjual</span></div>
+                    <div class="item-arrow">›</div>
+                </button>
+            </div>
+
+            <div class="stats-box">
+                <div class="stat"><b>100%</b><span>Aman</span></div>
+                <div class="stat-line"></div>
+                <div class="stat"><b>24/7</b><span>Support</span></div>
+                <div class="stat-line"></div>
+                <div class="stat"><b>2-5%</b><span>Fee</span></div>
+            </div>
+        </div>
+
+        <div class="powered" onclick="openAdmin()">PoweredByAryanzUtama</div>
+    </div>
+
+    <!-- PAGE 2: BUYER FORM -->
+    <div id="page-buyer" class="page">
+        <div class="nav-bar">
+            <button onclick="goHome()" class="nav-btn">‹ Back</button>
+            <span>Buyer</span>
+        </div>
+        <div class="form-wrap">
+            <div class="form-head">
+                <div class="form-icon">🛒</div>
+                <h2>Masuk sebagai Buyer</h2>
+            </div>
+            <div class="input-box">
+                <label>Nama Buyer</label>
+                <input type="text" id="b-name" placeholder="Nama lengkap" oninput="checkBuyer()">
+            </div>
+            <div class="input-box">
+                <label>WhatsApp</label>
+                <input type="tel" id="b-wa" placeholder="08xxxxxxxxxx" oninput="checkBuyer()">
+            </div>
+            <div class="input-box">
+                <label>Kode Room</label>
+                <input type="number" id="b-code" placeholder="6 digit" oninput="checkBuyer()">
+            </div>
+            <button id="btn-b" class="main-btn" onclick="joinBuyer()" disabled>Masuk Room</button>
         </div>
     </div>
+
+    <!-- PAGE 3: SELLER FORM -->
+        <!-- PAGE 3: SELLER FORM -->
+    <div id="page-seller" class="page">
+        <div class="nav-bar">
+            <button onclick="goHome()" class="nav-btn">‹ Back</button>
+            <span>Seller</span>
+        </div>
+        <div class="form-wrap">
+            <div class="form-head">
+                <div class="form-icon">🏪</div>
+                <h2>Buat Room Baru</h2>
+            </div>
+            <div class="input-box">
+                <label>Nama Seller</label>
+                <input type="text" id="s-name" placeholder="Nama seller" oninput="checkSeller()">
+            </div>
+            <div class="input-box">
+                <label>Nominal Transaksi</label>
+                <input type="text" id="s-nom" placeholder="50000" onkeyup="formatUang()">
+                <div class="uang-text" id="uang">Rp0</div>
+            </div>
+            <div class="input-box">
+                <label>Tipe</label>
+                <div class="type-btns">
+                    <button onclick="setTipe('INC')" id="t-inc" class="t-btn">INC</button>
+                    <button onclick="setTipe('EXC')" id="t-exc" class="t-btn">EXC</button>
+                </div>
+            </div>
+            <div class="input-box">
+                <label>WhatsApp</label>
+                <input type="tel" id="s-wa" placeholder="08xxxxxxxxxx" oninput="checkSeller()">
+            </div>
+            <button id="btn-s" class="main-btn green" onclick="buatRoom()" disabled>Buat Room</button>
+
+            <div id="hasil-room" class="hasil-box" style="display:none;">
+                <div class="kode-label">ROOM CODE</div>
+                <div class="kode-angka" id="kode">000000</div>
+                <button class="copy-btn" onclick="salinKode()">📋 Salin Kode</button>
+                <button class="main-btn" onclick="masukSeller()">Masuk Room</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 4: ADMIN LOGIN -->
+    <div id="page-admin-login" class="page admin-bg">
+        <div class="admin-modal">
+            <div class="adm-icon">🔐</div>
+            <h3>Admin Access</h3>
+            <input type="password" id="adm-pass" placeholder="Password">
+            <button class="main-btn" onclick="cekAdmin()">Masuk</button>
+            <button class="batal-btn" onclick="goHome()">Batal</button>
+        </div>
+    </div>
+
+    <!-- PAGE 5: ADMIN DASHBOARD -->
+    <div id="page-admin-dash" class="page">
+        <div class="nav-bar">
+            <button onclick="goHome()" class="nav-btn">‹ Logout</button>
+            <span>Admin Panel</span>
+        </div>
+        <div class="realtime-indicator">
+            <span class="pulse-dot"></span>
+            LIVE
+        </div>
+        <div class="admin-container">
+            <h2 style="margin-bottom: 16px; color: var(--ios-blue);">Room Aktif</h2>
+            <div id="admin-room-list" class="room-list"></div>
+        </div>
+    </div>
+
+    <!-- LANJUT PART 2 -->
+        <!-- PAGE 6: CHAT -->
+    <div id="page-chat" class="page">
+        <div class="chat-head">
+            <button onclick="goHome()" class="back-chat">‹</button>
+            <img src="https://res.cloudinary.com/dtdodhqqi/image/upload/v1766845910/IMG-20251128-WA0094_1_rrrhdn.jpg" class="chat-ava">
+            <div class="chat-info">
+                <span id="chat-nom">Rp0</span>
+                <span id="chat-tipe" class="tipe-badge">INC</span>
+            </div>
+            <button class="menu-chat" onclick="infoRoom()">•••</button>
+        </div>
+
+        <div class="chat-bg" onclick="tutupMenu()">
+            <div id="chat-msgs" class="msg-list"></div>
+        </div>
+
+        <!-- PAYMENT SECTION -->
+        <div id="payment-section" style="display:none;" class="payment-container">
+            <div class="payment-box">
+                <div class="payment-header">Payment Rekber by AryanzUtama</div>
+                <div class="payment-list">
+• 0-15K ~ 3K
+• 16-100K ~ 5K
+• 101-250K ~ 10K
+• 251-500K ~ 15K
+• DST
+                </div>
+                <div class="payment-detail">
+                    <div class="pay-row">
+                        <span>DANA: 089588037479</span>
+                        <button class="copy-small" onclick="copyText('089588037479')">Salin</button>
+                    </div>
+                    <div class="pay-an">A/N: Ni Koman</div>
+                    
+                    <div class="pay-row" style="margin-top:8px;">
+                        <span>Gopay: 0895329660340</span>
+                        <button class="copy-small" onclick="copyText('0895329660340')">Salin</button>
+                    </div>
+                    <div class="pay-an">A/N: AryanzUtama</div>
+                    
+                    <div class="pay-row" style="margin-top:8px;">
+                        <span>QRIS</span>
+                        <button class="copy-small" onclick="showQRIS()">Lihat</button>
+                    </div>
+                </div>
+                <div class="payment-note">❗ SERTAKAN BUKTI TF!</div>
+            </div>
+        </div>
+
+        <div class="input-float">
+            <div class="blur-bg"></div>
+            <div class="input-row">
+                <button class="btn-clip" onclick="document.getElementById('file-in').click()">📎</button>
+                <input type="file" id="file-in" hidden accept="image/*" onchange="kirimGambar(this)">
+                <div class="input-only">
+                    <input type="text" id="msg-in" placeholder="Pesan" onkeypress="if(event.key==='Enter')kirimPesan()">
+                </div>
+                <button class="btn-kirim" onclick="kirimPesan()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QRIS MODAL -->
+    <div id="qris-modal" class="modal">
+        <div class="modal-back" onclick="closeQRIS()"></div>
+        <div class="modal-content">
+            <img src="https://res.cloudinary.com/dtdodhqqi/image/upload/v1766779896/IMG-20251222-WA0068_thougk.jpg" class="qris-img">
+            <button class="main-btn" onclick="downloadQRIS()">Simpan Foto</button>
+            <button class="batal-btn" onclick="closeQRIS()">Tutup</button>
+        </div>
+    </div>
+
+    <!-- CONTEXT MENU (Telegram Style) -->
+    <div id="ctx-menu" class="ctx-menu">
+        <div class="ctx-back" onclick="tutupMenu()"></div>
+        <div class="ctx-box">
+            <div class="ctx-header">Pesan</div>
+            <button onclick="editPesan()">
+                <span class="ctx-icon">✏️</span>
+                <span>Edit Pesan</span>
+            </button>
+            <button onclick="hapusPesan()" class="red">
+                <span class="ctx-icon">🗑</span>
+                <span>Hapus Pesan</span>
+            </button>
+            <div class="ctx-line"></div>
+            <button onclick="tutupMenu()">Batal</button>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-back" onclick="closeEdit()"></div>
+        <div class="modal-content">
+            <h3>Edit Pesan</h3>
+            <input type="text" id="edit-input" placeholder="Edit pesan...">
+            <button class="main-btn" onclick="saveEdit()">Simpan</button>
+            <button class="batal-btn" onclick="closeEdit()">Batal</button>
+        </div>
+    </div>
+
+    <!-- SPAM MODAL -->
+    <div id="spam-modal" class="spam-modal">
+        <div class="spam-content">
+            <div class="spam-icon">⚠️</div>
+            <h3>Spam Terdeteksi</h3>
+            <p>Anda mengirim terlalu cepat</p>
+            <div class="spam-options">
+                <button class="spam-btn" onclick="handleSpam('lanjut')">Lanjutkan</button>
+                <button class="spam-btn" onclick="handleSpam('batal')">Batal TRX</button>
+                <button class="spam-btn" onclick="handleSpam('bagi')">Bagi Dua</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REFUND MODAL -->
+    <div id="refund-modal" class="modal">
+        <div class="modal-back" onclick="closeRefund()"></div>
+        <div class="modal-content refund-form">
+            <h3>Format Refund</h3>
+            <input type="text" id="refund-nomor" placeholder="Nomor e-wallet">
+            <input type="text" id="refund-an" placeholder="Atas Nama">
+            <div class="wallet-select">
+                <label class="wallet-opt"><input type="radio" name="wallet" value="Dana" onchange="selectWallet(this)"> Dana</label>
+                <label class="wallet-opt"><input type="radio" name="wallet" value="Gopay" onchange="selectWallet(this)"> Gopay</label>
+                <label class="wallet-opt"><input type="radio" name="wallet" value="QRIS" onchange="selectWallet(this)"> QRIS</label>
+                <label class="wallet-opt"><input type="radio" name="wallet" value="Ovo" onchange="selectWallet(this)"> Ovo</label>
+                <label class="wallet-opt"><input type="radio" name="wallet" value="SeaBank" onchange="selectWallet(this)"> SeaBank</label>
+            </div>
+            <button class="main-btn" onclick="submitRefund()">Kirim Refund</button>
+            <button class="batal-btn" onclick="closeRefund()">Batal</button>
+        </div>
+    </div>
+
+    <!-- IMAGE VIEWER MODAL -->
+    <div id="img-modal" class="modal">
+        <div class="modal-back" onclick="closeImg()"></div>
+        <img id="img-viewer" src="" style="max-width:90%; max-height:80%; border-radius:12px; z-index:1;">
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
+
+    <!-- LOADING OVERLAY -->
+    <div id="loading" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <style>
+        /* ═══════════════════════════════════════════════════════ */
+        /* CHAT STYLES - TELEGRAM iOS STYLE FULL ANIMATION */
+        /* ═══════════════════════════════════════════════════════ */
+
+        .chat-head {
+            background: rgba(28,28,30,0.95);
+            backdrop-filter: blur(20px);
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--ios-border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .back-chat {
+            background: none;
+            border: none;
+            color: var(--ios-blue);
+            font-size: 28px;
+            cursor: pointer;
+            padding: 4px;
+            transition: transform 0.2s;
+        }
+
+        .back-chat:active {
+            transform: scale(0.9) translateX(-3px);
+        }
+
+        .chat-ava {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--ios-border);
+            animation: pulse 2s infinite;
+        }
+
+        .chat-info {
+            flex: 1;
+        }
+
+        .chat-info span:first-child {
+            font-size: 15px;
+            font-weight: 600;
+            display: block;
+        }
+
+        .tipe-badge {
+            background: rgba(52,199,89,0.2);
+            color: var(--ios-green);
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 2px;
+            display: inline-block;
+        }
+
+        .menu-chat {
+            background: none;
+            border: none;
+            color: var(--ios-gray);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            transition: all 0.3s;
+        }
+
+        .menu-chat:active {
+            transform: scale(1.2);
+            color: white;
+        }
+
+        /* CHAT BACKGROUND WITH BLUR */
+        .chat-bg {
+            height: calc(100vh - 120px);
+            background: #0f0f0f;
+            background-image: url('https://res.cloudinary.com/dtdodhqqi/image/upload/v1771310542/c36725a5a2a254a5df8c7dd4bdaa05af_v3tzna.jpg');
+            background-size: cover;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* TOP BLUR GRADIENT */
+        .chat-bg::before {
+            content: '';
+            position: fixed;
+            top: 50px;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(to bottom, rgba(15,15,15,0.95) 0%, transparent 100%);
+            backdrop-filter: blur(10px);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* MESSAGE LIST */
+        .msg-list {
+            padding: 20px 12px 160px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* BUBBLE CHAT - 3 ROLE SYSTEM */
+        /* ═══════════════════════════════════════════════════════ */
+
+        .bubble {
+            max-width: 80%;
+            margin-bottom: 4px;
+            padding: 8px 12px;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.35;
+            position: relative;
+            word-wrap: break-word;
+            animation: msgPop 0.3s var(--spring);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        @keyframes msgPop {
+            0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+            70% { transform: scale(1.02); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .bubble:active {
+            transform: scale(0.98);
+        }
+
+        /* ROLE: ADMIN = Biru, Kanan */
+        .bubble.admin {
+            align-self: flex-end;
+            background: var(--ios-blue);
+            color: white;
+            border-bottom-right-radius: 4px;
+            margin-left: auto;
+        }
+
+        /* ROLE: BUYER = Abu, Kiri */
+        .bubble.buyer {
+            align-self: flex-start;
+            background: #3a3a3c;
+            color: white;
+            border-bottom-left-radius: 4px;
+            margin-right: auto;
+        }
+
+        /* ROLE: SELLER = Hijau, Kiri */
+        .bubble.seller {
+            align-self: flex-start;
+            background: #1c3a1c;
+            color: #4CD964;
+            border-bottom-left-radius: 4px;
+            margin-right: auto;
+        }
+
+        /* SYSTEM MESSAGE */
+        .bubble.system {
+            align-self: center;
+            background: rgba(0,0,0,0.6);
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: 14px;
+            max-width: 90%;
+        }
+
+        /* SENDER NAME + ROLE BADGE */
+        .sender-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 3px;
+        }
+
+        .sender-name {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .role-badge {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .bubble.admin .sender-name { color: rgba(255,255,255,0.9); }
+        .bubble.admin .role-badge { background: rgba(255,255,255,0.3); color: white; }
+
+        .bubble.buyer .sender-name { color: var(--ios-blue); }
+        .bubble.buyer .role-badge { background: rgba(0,122,255,0.2); color: var(--ios-blue); }
+
+        .bubble.seller .sender-name { color: var(--ios-green); }
+        .bubble.seller .role-badge { background: rgba(52,199,89,0.2); color: var(--ios-green); }
+
+        .bubble.admin .sender-row,
+        .bubble.system .sender-row {
+            display: none;
+        }
+
+        /* MESSAGE CONTENT */
+        .msg-text {
+            display: inline;
+        }
+
+        .msg-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 8px;
+            float: right;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .msg-time {
+            opacity: 0.7;
+        }
+
+        .msg-edited {
+            font-size: 10px;
+            opacity: 0.6;
+            font-style: italic;
+        }
+
+        .checkmarks {
+            font-size: 12px;
+            letter-spacing: -2px;
+        }
+
+        .bubble.admin .checkmarks {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .bubble.buyer .checkmarks,
+        .bubble.seller .checkmarks {
+            display: none;
+        }
+
+        /* DELETED MESSAGE */
+        .msg-deleted {
+            font-style: italic;
+            opacity: 0.6;
+        }
+
+        /* IMAGE IN CHAT */
+        .chat-img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: block;
+            margin: 4px 0;
+            transition: transform 0.2s;
+        }
+
+        .chat-img:active {
+            transform: scale(0.98);
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* INPUT AREA WITH BLUR */
+        /* ═══════════════════════════════════════════════════════ */
+
+        .input-float {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 12px 28px;
+            z-index: 100;
+        }
+
+        .blur-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 120%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            mask-image: linear-gradient(to top, black 0%, black 60%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to top, black 0%, black 60%, transparent 100%);
+            z-index: -1;
+        }
+
+        .input-row {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .btn-clip, .btn-kirim {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--ios-gray);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s var(--spring);
+        }
+
+        .btn-clip:active {
+            transform: scale(0.9);
+            background: rgba(255,255,255,0.2);
+        }
+
+        .btn-kirim {
+            background: var(--ios-blue);
+            color: white;
+        }
+
+        .btn-kirim:active {
+            transform: scale(0.85);
+        }
+
+        .input-only {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 10px 16px;
+            transition: all 0.3s;
+        }
+
+        .input-only:focus-within {
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 0 2px rgba(0,122,255,0.3);
+        }
+
+        .input-only input {
+            width: 100%;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+
+        /* PAYMENT SECTION */
+        .payment-container {
+            position: fixed;
+            bottom: 85px;
+            left: 0;
+            right: 0;
+            max-height: 35vh;
+            overflow-y: auto;
+            z-index: 50;
+            padding: 0 12px;
+            animation: slideUp 0.4s var(--spring);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .payment-box {
+            background: rgba(28,28,30,0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--ios-border);
+            font-size: 13px;
+            max-width: 380px;
+            margin: 0 auto;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .payment-header {
+            font-weight: 700;
+            color: var(--ios-green);
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .payment-list {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-family: monospace;
+        }
+
+        .payment-detail {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .pay-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        .copy-small {
+            background: rgba(0,122,255,0.2);
+            color: var(--ios-blue);
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-small:active {
+            transform: scale(0.95);
+        }
+
+        .pay-an {
+            font-size: 11px;
+            color: var(--ios-gray);
+            margin-bottom: 8px;
+        }
+
+        .payment-note {
+            text-align: center;
+            color: var(--ios-red);
+            font-size: 11px;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* MODALS - FULL ANIMATION */
+        /* ═══════════════════════════════════════════════════════ */
+
+                /* ═══════════════════════════════════════════════════════ */
+        /* MODALS - FULL ANIMATION */
+        /* ═══════════════════════════════════════════════════════ */
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .modal-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: #1c1c1e;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 320px;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            border: 1px solid var(--ios-border);
+            animation: scaleIn 0.3s var(--spring);
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-content h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 14px;
+            background: #2c2c2e;
+            border: 1px solid var(--ios-border);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .qris-img {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        /* CONTEXT MENU - TELEGRAM STYLE */
+        .ctx-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 3000;
+            display: none;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 12px;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .ctx-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(3px);
+        }
+
+        .ctx-box {
+            background: #2c2c2e;
+            border-radius: 16px;
+            overflow: hidden;
+            animation: slideUp 0.35s var(--spring);
+            margin-bottom: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .ctx-header {
+            padding: 16px;
+            text-align: center;
+            color: var(--ios-gray);
+            font-size: 13px;
+            border-bottom: 1px solid var(--ios-border);
+        }
+
+        .ctx-box button {
+            width: 100%;
+            padding: 16px;
+            background: none;
+            border: none;
+            color: var(--ios-blue);
+            font-size: 17px;
+            border-bottom: 1px solid var(--ios-border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.2s;
+        }
+
+        .ctx-box button:active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .ctx-box button.red {
+            color: var(--ios-red);
+        }
+
+        .ctx-icon {
+            font-size: 20px;
+            width: 24px;
+        }
+
+        .ctx-line {
+            height: 8px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        /* SPAM MODAL */
+        .spam-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 2500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .spam-content {
+            background: #1c1c1e;
+            border-radius: 20px;
+            padding: 32px 24px;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+            border: 1px solid rgba(255,59,48,0.3);
+            animation: scaleIn 0.4s var(--spring);
+        }
+
+        .spam-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(0); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        .spam-content h3 {
+            color: var(--ios-red);
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+
+        .spam-content p {
+            color: var(--ios-gray);
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .spam-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .spam-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .spam-btn:active {
+            background: rgba(255,255,255,0.2);
+            transform: scale(0.98);
+        }
+
+        /* REFUND FORM */
+        .refund-form {
+            text-align: left;
+        }
+
+        .refund-form h3 {
+            text-align: center;
+            color: var(--ios-red);
+            margin-bottom: 20px;
+        }
+
+        .wallet-select {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .wallet-opt {
+            background: #2c2c2e;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            font-size: 14px;
+            color: var(--ios-gray);
+            transition: all 0.2s;
+        }
+
+        .wallet-opt:active {
+            transform: scale(0.95);
+        }
+
+        .wallet-opt.active {
+            border-color: var(--ios-green);
+            color: var(--ios-green);
+            background: rgba(52,199,89,0.15);
+        }
+
+        .wallet-opt input {
+            display: none;
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 24px;
+            font-size: 15px;
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s var(--spring);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* LOADING */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: var(--ios-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+        }
+    </style>
 
     <!-- FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-    <script>
-        // CONFIG
+    <!-- LANJUT PART 3 -->
+        <script>
+        // ═══════════════════════════════════════════════════════
+        // FIREBASE CONFIG
+        // ═══════════════════════════════════════════════════════
         const firebaseConfig = {
             apiKey: "AIzaSyDpQhIcitZwMMhQIHhpB9rp_k0EpBJT-2k",
             authDomain: "chat-real-time-32576.firebaseapp.com",
@@ -325,130 +1717,789 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const storage = firebase.storage();
 
-        // STATE
-        let currentRole = '';
-        let currentName = '';
-        let currentRoom = '';
-        let messageListener = null;
+        const BOT_TOKEN = "8672339759:AAF_jy2iB5xZlHh6843s-8RkukvJ5-yROto";
+        const CHAT_ID = "7129085772";
 
-        // PILIH ROLE
-        function selectRole(role) {
-            currentRole = role;
-            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Auto isi nama berdasarkan role
-            const nameInput = document.getElementById('username');
-            if(role === 'admin') nameInput.value = 'AryanzUtama';
-            
-            checkInput();
-            updateTestPanel();
-        }
+        // ═══════════════════════════════════════════════════════
+        // GLOBAL STATE
+        // ═══════════════════════════════════════════════════════
+        let currentRole = '';      // 'admin', 'buyer', 'seller'
+        let currentName = '';      // nama user
+        let currentRoom = '';      // kode room
+        let roomData = {};         // data room (nominal, tipe, dll)
+        let msgIdSelect = null;    // pesan yang dipilih untuk edit/hapus
+        let chatListener = null;   // listener chat
+        let adminListener = null;  // listener admin
+        let msgCount = 0;          // counter spam
+        let lastMsgTime = 0;       // waktu pesan terakhir
+        let chatLocked = false;    // lock chat karena spam
+        let selectedWallet = '';   // wallet refund
+        let renderedMsgs = new Set(); // cegah duplikat
 
-        function checkInput() {
-            const name = document.getElementById('username').value;
-            const room = document.getElementById('room-code').value;
-            document.getElementById('enter-btn').disabled = !(currentRole && name && room.length === 6);
-        }
+        // ═══════════════════════════════════════════════════════
+        // NAVIGATION FUNCTIONS
+        // ═══════════════════════════════════════════════════════
+        function showPage(id) {
+            // Hide all pages with fade
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active-page');
+                setTimeout(() => {
+                    if (!p.classList.contains('active-page')) {
+                        p.style.display = 'none';
+                    }
+                }, 400);
+            });
 
-        // ENTER CHAT
-        function enterChat() {
-            currentName = document.getElementById('username').value || currentRole;
-            currentRoom = document.getElementById('room-code').value;
-            
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('chat-page').style.display = 'flex';
-            
-            // Setup header
-            document.getElementById('header-avatar').textContent = currentRole[0].toUpperCase();
-            document.getElementById('header-name').textContent = `Room ${currentRoom} (${currentRole})`;
-            document.getElementById('header-status').textContent = `as ${currentName}`;
-            
-            // Listen messages
-            listenMessages();
-            
-            updateTestPanel();
-        }
-
-        // LISTEN MESSAGES
-        function listenMessages() {
-            if(messageListener) {
-                db.ref('test-rooms/' + currentRoom).off('child_added', messageListener);
+            // Show target page
+            const el = document.getElementById('page-' + id);
+            if (el) {
+                el.style.display = 'block';
+                // Force reflow
+                void el.offsetWidth;
+                el.classList.add('active-page');
             }
-            
-            document.getElementById('messages').innerHTML = '';
-            
-            messageListener = db.ref('test-rooms/' + currentRoom).on('child_added', snapshot => {
-                const msg = snapshot.val();
-                displayMessage(msg);
+        }
+
+        function goHome() {
+            // Cleanup listeners
+            if (chatListener) {
+                db.ref('rooms/' + currentRoom + '/messages').off('child_added', chatListener);
+                chatListener = null;
+            }
+            if (adminListener) {
+                db.ref('rooms').off('value', adminListener);
+                adminListener = null;
+            }
+
+            // Reset state
+            currentRole = '';
+            currentName = '';
+            currentRoom = '';
+            renderedMsgs.clear();
+            chatLocked = false;
+
+            showPage('home');
+        }
+
+        function goBuyer() {
+            showPage('buyer');
+        }
+
+        function goSeller() {
+            showPage('seller');
+        }
+
+        function openAdmin() {
+            showPage('admin-login');
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // SELLER FUNCTIONS
+        // ═══════════════════════════════════════════════════════
+        function formatUang() {
+            let v = document.getElementById('s-nom').value.replace(/\D/g, '');
+            document.getElementById('s-nom').value = v;
+            const formatted = v ? 'Rp' + parseInt(v).toLocaleString('id-ID') : 'Rp0';
+            document.getElementById('uang').textContent = formatted;
+            checkSeller();
+        }
+
+        function setTipe(t) {
+            document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('aktif'));
+            document.getElementById('t-' + t.toLowerCase()).classList.add('aktif');
+            roomData.tipe = t;
+            checkSeller();
+        }
+
+        function checkSeller() {
+            const n = document.getElementById('s-name').value;
+            const m = document.getElementById('s-nom').value;
+            const w = document.getElementById('s-wa').value;
+            const hasTipe = document.querySelector('.t-btn.aktif');
+            document.getElementById('btn-s').disabled = !(n && m && w && hasTipe);
+        }
+
+        function buatRoom() {
+            currentName = document.getElementById('s-name').value;
+            currentRoom = String(Math.floor(100000 + Math.random() * 900000));
+            const wa = document.getElementById('s-wa').value;
+            const nominal = document.getElementById('uang').textContent;
+
+            // Tampilkan kode
+            document.getElementById('kode').textContent = currentRoom;
+            document.getElementById('hasil-room').style.display = 'block';
+
+            // Simpan ke Firebase
+            db.ref('rooms/' + currentRoom).set({
+                info: {
+                    nominal: nominal,
+                    tipe: roomData.tipe,
+                    seller: currentName,
+                    wa: wa,
+                    created: Date.now(),
+                    status: 'active'
+                },
+                messages: {}
+            });
+
+            // Notif Telegram
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: `🏪 NEW SELLER\nNama: ${currentName}\nNominal: ${nominal}\nTipe: ${roomData.tipe}\nRoom: ${currentRoom}`
+                })
+            });
+
+            showToast('Room berhasil dibuat!');
+        }
+
+        function salinKode() {
+            navigator.clipboard.writeText(currentRoom);
+            showToast('Kode disalin: ' + currentRoom);
+        }
+
+        function masukSeller() {
+            currentRole = 'seller';
+            masukChat(false);
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // BUYER FUNCTIONS
+        // ═══════════════════════════════════════════════════════
+        function checkBuyer() {
+            const n = document.getElementById('b-name').value;
+            const w = document.getElementById('b-wa').value;
+            const c = document.getElementById('b-code').value;
+            document.getElementById('btn-b').disabled = !(n && w && c.length === 6);
+        }
+
+        function joinBuyer() {
+            currentName = document.getElementById('b-name').value;
+            currentRoom = document.getElementById('b-code').value;
+            const wa = document.getElementById('b-wa').value;
+
+            // Cek room exists
+            db.ref('rooms/' + currentRoom).once('value').then(snap => {
+                if (!snap.exists()) {
+                    showToast('Room tidak ditemukan!');
+                    return;
+                }
+
+                const info = snap.val().info;
+                roomData = info;
+
+                // Simpan buyer
+                db.ref('rooms/' + currentRoom + '/buyer').set({
+                    name: currentName,
+                    wa: wa,
+                    joined: Date.now()
+                });
+
+                currentRole = 'buyer';
+                masukChat(true);
+
+                // Notif Telegram
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: `🛒 NEW BUYER\nNama: ${currentName}\nRoom: ${currentRoom}`
+                    })
+                });
             });
         }
 
-        // DISPLAY MESSAGE - INI YANG PENTING!
-        function displayMessage(msg) {
-            const container = document.getElementById('messages');
+        // ═══════════════════════════════════════════════════════
+        // ADMIN FUNCTIONS
+        // ═══════════════════════════════════════════════════════
+        function cekAdmin() {
+            const pass = document.getElementById('adm-pass').value;
+            if (pass === 'khansa') {
+                currentRole = 'admin';
+                currentName = 'AryanzUtama';
+                showPage('admin-dash');
+                startAdminRealtime();
+                showToast('Welcome Admin!');
+            } else {
+                showToast('Password salah!');
+            }
+        }
+
+        function startAdminRealtime() {
+            const list = document.getElementById('admin-room-list');
+
+            adminListener = db.ref('rooms').on('value', snapshot => {
+                list.innerHTML = '';
+
+                if (!snapshot.exists()) {
+                    list.innerHTML = '<div style="text-align:center;color:var(--ios-gray);padding:40px;">Tidak ada room aktif</div>';
+                    return;
+                }
+
+                snapshot.forEach(child => {
+                    const roomId = child.key;
+                    const data = child.val();
+
+                    const div = document.createElement('div');
+                    div.className = 'room-item';
+                    div.innerHTML = `
+                        <div class="room-info">
+                            <b>Room ${roomId}</b>
+                            <span>${data.info.nominal} - ${data.info.tipe}</span>
+                            <small>Seller: ${data.info.seller}</small>
+                        </div>
+                        <div class="room-actions">
+                            <button class="main-btn small" onclick="adminMasuk('${roomId}')">Masuk</button>
+                            <button class="delete-btn" onclick="hapusRoom('${roomId}')">Hapus</button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            });
+        }
+
+        function adminMasuk(roomId) {
+            currentRoom = roomId;
+
+            db.ref('rooms/' + currentRoom).once('value').then(snap => {
+                const info = snap.val().info;
+                roomData = info;
+                masukChat(false);
+            });
+        }
+
+        function hapusRoom(roomId) {
+            if (confirm('Yakin hapus room ' + roomId + '?')) {
+                db.ref('rooms/' + roomId).remove();
+                showToast('Room dihapus');
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // CHAT SYSTEM
+        // ═══════════════════════════════════════════════════════
+        function masukChat(showPayment) {
+            showPage('chat');
+
+            // Setup header
+            document.getElementById('chat-nom').textContent = roomData.nominal || 'Rp0';
+            document.getElementById('chat-tipe').textContent = roomData.tipe || '-';
+
+            // Show/hide payment
+            document.getElementById('payment-section').style.display = showPayment ? 'block' : 'none';
+
+            // Clear messages
+            document.getElementById('chat-msgs').innerHTML = '';
+            renderedMsgs.clear();
+
+            // Start listener
+            startChatListener();
+
+            // Kirim pesan pembuka jika seller
+            if (currentRole === 'seller') {
+                setTimeout(() => {
+                    kirimPesanSystem(`Halo! 👋\nSaya ${currentName}\n💰 ${roomData.nominal}\n📌 ${roomData.tipe}`);
+                }, 500);
+            }
+        }
+
+        function startChatListener() {
+            chatListener = db.ref('rooms/' + currentRoom + '/messages').on('child_added', snap => {
+                const msgId = snap.key;
+                const msg = snap.val();
+
+                // Cegah duplikat
+                if (renderedMsgs.has(msgId)) return;
+                renderedMsgs.add(msgId);
+
+                tampilPesan(msgId, msg);
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // TOAST NOTIFICATION
+        // ═══════════════════════════════════════════════════════
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // LOADING OVERLAY
+        // ═══════════════════════════════════════════════════════
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+        }
+
+        // LANJUT PART 4
+        </script>
+            <script>
+        // ═══════════════════════════════════════════════════════
+        // PART 4: CHAT DISPLAY & INTERACTION - FULL ANIMATION
+        // ═══════════════════════════════════════════════════════
+
+        // TAMPILKAN PESAN - 3 ROLE SYSTEM
+        function tampilPesan(msgId, msg) {
+            const container = document.getElementById('chat-msgs');
             const div = document.createElement('div');
+
+            // Tentukan class berdasarkan ROLE pengirim (bukan yang baca!)
+            // Ini kunci utama agar bubble tidak bentrok
+            let bubbleClass = msg.role || 'system';
             
-            // TENTUKAN CLASS BERDASARKAN ROLE PENGIRIM
-            // Bukan berdasarkan siapa yang lihat, tapi siapa yang kirim!
-            div.className = 'message ' + msg.role; // admin / buyer / seller
+            // Cek apakah ini pesan sendiri
+            const isMe = (msg.role === currentRole && msg.name === currentName);
             
-            const time = new Date(msg.timestamp).toLocaleTimeString('id-ID', {
-                hour: '2-digit', 
+            div.className = 'bubble ' + bubbleClass;
+            div.dataset.id = msgId;
+
+            // Format waktu
+            const time = new Date(msg.timestamp || Date.now()).toLocaleTimeString('id-ID', {
+                hour: '2-digit',
                 minute: '2-digit'
             });
-            
-            div.innerHTML = `
-                <div class="sender">${msg.name} (${msg.role})</div>
-                ${msg.text}
-                <span class="time">${time}</span>
-            `;
-            
+
+            // Build HTML
+            let html = '';
+
+            // Sender row (nama + role badge) - hanya untuk orang lain
+            if (!isMe && msg.role !== 'system') {
+                html += `
+                    <div class="sender-row">
+                        <span class="sender-name">${escapeHtml(msg.name)}</span>
+                        <span class="role-badge">${msg.role}</span>
+                    </div>
+                `;
+            }
+
+            // Content
+            if (msg.deleted) {
+                html += `<div class="msg-deleted">Pesan dihapus</div>`;
+            } else if (msg.type === 'image') {
+                html += `<img src="${msg.url}" class="chat-img" onclick="viewImage('${msg.url}')">`;
+            } else {
+                html += `<div class="msg-text">${escapeHtml(msg.text)}</div>`;
+            }
+
+            // Meta (waktu + edited + checkmarks)
+            if (!msg.deleted) {
+                html += `
+                    <div class="msg-meta">
+                        ${msg.edited ? '<span class="msg-edited">edited</span>' : ''}
+                        <span class="msg-time">${time}</span>
+                        ${isMe ? '<span class="checkmarks">✓✓</span>' : ''}
+                    </div>
+                `;
+            }
+
+            div.innerHTML = html;
+
+            // Long press untuk edit/hapus (hanya pesan sendiri)
+            if (isMe && !msg.deleted) {
+                addLongPress(div, msgId, msg);
+            }
+
+            // Animasi masuk
+            div.style.opacity = '0';
+            div.style.transform = 'translateY(20px)';
             container.appendChild(div);
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+                div.style.transition = 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                div.style.opacity = '1';
+                div.style.transform = 'translateY(0)';
+            });
+
+            // Auto scroll
             container.scrollTop = container.scrollHeight;
+
+            // Spam detection
+            if (isMe) {
+                checkSpam();
+            }
         }
 
-        // SEND MESSAGE
-        function sendMessage() {
-            const input = document.getElementById('message-input');
+        // ESCAPE HTML - Security
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML.replace(/\n/g, '<br>');
+        }
+
+        // LONG PRESS HANDLER
+        function addLongPress(element, msgId, msg) {
+            let timer;
+            const start = (e) => {
+                timer = setTimeout(() => {
+                    e.preventDefault();
+                    bukaMenu(msgId, msg);
+                }, 600);
+            };
+            const end = () => clearTimeout(timer);
+
+            element.addEventListener('touchstart', start, {passive: false});
+            element.addEventListener('touchend', end);
+            element.addEventListener('mousedown', start);
+            element.addEventListener('mouseup', end);
+            element.addEventListener('mouseleave', end);
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // KIRIM PESAN
+        // ═══════════════════════════════════════════════════════
+        function kirimPesan() {
+            if (chatLocked) {
+                showToast('Chat terkunci - spam terdeteksi');
+                return;
+            }
+
+            const input = document.getElementById('msg-in');
             const text = input.value.trim();
-            if(!text) return;
-            
-            // KIRIM DENGAN ROLE YANG JELAS
-            db.ref('test-rooms/' + currentRoom).push({
-                role: currentRole,      // 'admin', 'buyer', atau 'seller'
-                name: currentName,      // nama user
+            if (!text) return;
+
+            // Reset input dengan animasi
+            input.style.transform = 'scale(0.95)';
+            setTimeout(() => input.style.transform = '', 100);
+
+            // Kirim ke Firebase
+            const msgData = {
+                role: currentRole,
+                name: currentName,
                 text: text,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                type: 'text'
+            };
+
+            db.ref('rooms/' + currentRoom + '/messages').push(msgData);
+
+            input.value = '';
+
+            // Auto reply untuk buyer yang cek payment
+            if (currentRole === 'buyer') {
+                const cekWords = ['cek', 'c', 'msuk', 'masuk', 'udah', 'done', 'sudah'];
+                const isCek = cekWords.some(w => text.toLowerCase().includes(w));
+                
+                if (isCek) {
+                    setTimeout(() => {
+                        kirimPesanSystem('AryanzUtama sedang cek saldo, mohon tunggu...');
+                    }, 800);
+                }
+            }
+        }
+
+        // KIRIM PESAN SYSTEM (bot)
+        function kirimPesanSystem(text) {
+            db.ref('rooms/' + currentRoom + '/messages').push({
+                role: 'system',
+                name: 'System',
+                text: text,
+                timestamp: Date.now(),
+                type: 'text'
             });
-            
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // KIRIM GAMBAR - WITH UPLOAD PROGRESS
+        // ═══════════════════════════════════════════════════════
+        function kirimGambar(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validasi
+            if (!file.type.startsWith('image/')) {
+                showToast('Hanya file gambar');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Maksimal 5MB');
+                return;
+            }
+
+            showLoading(true);
+
+            const fileName = `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`;
+            const ref = storage.ref(`chat_images/${currentRoom}/${fileName}`);
+
+            const uploadTask = ref.put(file);
+
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload: ' + progress + '%');
+                },
+                (error) => {
+                    showLoading(false);
+                    showToast('Gagal upload gambar');
+                },
+                () => {
+                    uploadTask.snapshot.ref.getDownloadURL().then((url) => {
+                        showLoading(false);
+                        
+                        db.ref('rooms/' + currentRoom + '/messages').push({
+                            role: currentRole,
+                            name: currentName,
+                            url: url,
+                            timestamp: Date.now(),
+                            type: 'image'
+                        });
+                    });
+                }
+            );
+
             input.value = '';
         }
 
-        // BACK
-        function backToLogin() {
-            if(messageListener) {
-                db.ref('test-rooms/' + currentRoom).off('child_added', messageListener);
+        // VIEW IMAGE FULL SCREEN
+        function viewImage(url) {
+            const modal = document.getElementById('img-modal');
+            const img = document.getElementById('img-viewer');
+            img.src = url;
+            modal.style.display = 'flex';
+        }
+
+        function closeImg() {
+            document.getElementById('img-modal').style.display = 'none';
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // SPAM DETECTION
+        // ═══════════════════════════════════════════════════════
+        function checkSpam() {
+            const now = Date.now();
+            
+            if (now - lastMsgTime < 3000) {
+                msgCount++;
+                if (msgCount >= 5) {
+                    chatLocked = true;
+                    showSpamModal();
+                }
+            } else {
+                msgCount = 1;
             }
-            document.getElementById('chat-page').style.display = 'none';
-            document.getElementById('login-page').style.display = 'flex';
+            
+            lastMsgTime = now;
         }
 
-        // TEST PANEL - GANTI ROLE CEPAT
-        function setTestRole(role) {
-            currentRole = role;
-            currentName = role === 'admin' ? 'AryanzUtama' : role + '_' + Math.floor(Math.random()*1000);
-            document.getElementById('room-code').value = currentRoom || '123456';
-            enterChat();
+        function showSpamModal() {
+            document.getElementById('spam-modal').style.display = 'flex';
         }
 
-        function updateTestPanel() {
-            document.getElementById('current-role').textContent = `Role: ${currentRole || '-'}`;
+        function handleSpam(option) {
+            document.getElementById('spam-modal').style.display = 'none';
+            chatLocked = false;
+            msgCount = 0;
+
+            if (option === 'lanjut') {
+                kirimPesanSystem('Chat dilanjutkan. Mohon tidak spam.');
+            } else if (option === 'batal' && currentRole === 'buyer') {
+                document.getElementById('refund-modal').style.display = 'flex';
+            } else if (option === 'bagi') {
+                kirimPesanSystem('Fitur bagi dua sedang dikembangkan');
+            }
         }
 
+        // ═══════════════════════════════════════════════════════
+        // CONTEXT MENU - EDIT & DELETE
+        // ═══════════════════════════════════════════════════════
+        function bukaMenu(msgId, msg) {
+            msgIdSelect = msgId;
+            document.getElementById('ctx-menu').style.display = 'flex';
+        }
+
+        function tutupMenu() {
+            document.getElementById('ctx-menu').style.display = 'none';
+            msgIdSelect = null;
+        }
+
+        function editPesan() {
+            tutupMenu();
+            if (!msgIdSelect) return;
+
+            // Ambil pesan lama
+            db.ref('rooms/' + currentRoom + '/messages/' + msgIdSelect).once('value').then(snap => {
+                const msg = snap.val();
+                if (!msg || msg.deleted) return;
+
+                // Show edit modal
+                document.getElementById('edit-input').value = msg.text || '';
+                document.getElementById('edit-modal').style.display = 'flex';
+            });
+        }
+
+        function saveEdit() {
+            const newText = document.getElementById('edit-input').value.trim();
+            if (!newText) {
+                closeEdit();
+                return;
+            }
+
+            db.ref('rooms/' + currentRoom + '/messages/' + msgIdSelect).update({
+                text: newText,
+                edited: true,
+                editedAt: Date.now()
+            });
+
+            closeEdit();
+            showToast('Pesan diedit');
+        }
+
+        function closeEdit() {
+            document.getElementById('edit-modal').style.display = 'none';
+            msgIdSelect = null;
+        }
+
+        function hapusPesan() {
+            tutupMenu();
+            if (!msgIdSelect) return;
+
+            // Soft delete
+            db.ref('rooms/' + currentRoom + '/messages/' + msgIdSelect).update({
+                deleted: true,
+                text: null,
+                url: null
+            });
+
+            showToast('Pesan dihapus');
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // QRIS & PAYMENT
+        // ═══════════════════════════════════════════════════════
+        function showQRIS() {
+            document.getElementById('qris-modal').style.display = 'flex';
+        }
+
+        function closeQRIS() {
+            document.getElementById('qris-modal').style.display = 'none';
+        }
+
+        function downloadQRIS() {
+            const link = document.createElement('a');
+            link.href = 'https://res.cloudinary.com/dtdodhqqi/image/upload/v1766779896/IMG-20251222-WA0068_thougk.jpg';
+            link.download = 'QRIS_AryanzUtama.jpg';
+            link.click();
+            showToast('QRIS disimpan');
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text);
+            showToast('Disalin: ' + text);
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // REFUND SYSTEM
+        // ═══════════════════════════════════════════════════════
+        function selectWallet(radio) {
+            selectedWallet = radio.value;
+            document.querySelectorAll('.wallet-opt').forEach(el => {
+                el.classList.remove('active');
+            });
+            radio.parentElement.classList.add('active');
+        }
+
+        function submitRefund() {
+            const nomor = document.getElementById('refund-nomor').value.trim();
+            const an = document.getElementById('refund-an').value.trim();
+
+            if (!nomor || !an || !selectedWallet) {
+                showToast('Lengkapi semua data');
+                return;
+            }
+
+            // Kirim pesan refund
+            const refundText = `TRX BATAL ‼️\n\n` +
+                `Nomor: ${nomor}\n` +
+                `AN: ${an}\n` +
+                `Wallet: ${selectedWallet}\n\n` +
+                `Saldo sedang diproses...`;
+
+            kirimPesanSystem(refundText);
+
+            // Notif Telegram
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: `❌ REFUND\nRoom: ${currentRoom}\nNominal: ${roomData.nominal}\nWallet: ${selectedWallet}\nNo: ${nomor}\nAN: ${an}`
+                })
+            });
+
+            closeRefund();
+            showToast('Refund diajukan');
+        }
+
+        function closeRefund() {
+            document.getElementById('refund-modal').style.display = 'none';
+            document.getElementById('refund-nomor').value = '';
+            document.getElementById('refund-an').value = '';
+            selectedWallet = '';
+            document.querySelectorAll('.wallet-opt').forEach(el => el.classList.remove('active'));
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // INFO ROOM
+        // ═══════════════════════════════════════════════════════
+        function infoRoom() {
+            showToast(`Room: ${currentRoom} | ${roomData.nominal} | ${roomData.tipe}`);
+        }
+
+        // ═══════════════════════════════════════════════════════
         // INIT
-        document.getElementById('room-code').value = '123456';
+        // ═══════════════════════════════════════════════════════
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('home');
+            
+            // Add ripple effect to all buttons
+            document.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        background: rgba(255,255,255,0.3);
+                        border-radius: 50%;
+                        transform: scale(0);
+                        animation: ripple 0.6s linear;
+                        pointer-events: none;
+                    `;
+                    this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
+                    
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = e.clientX - rect.left - size/2 + 'px';
+                    ripple.style.top = e.clientY - rect.top - size/2 + 'px';
+                    
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+        });
+
+        // Ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
