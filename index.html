@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rekber Proto</title>
+<title>Rekber Real-Time</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -24,10 +24,11 @@ body{font-family:'Inter',sans-serif}
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 min-h-screen text-slate-800 flex items-center justify-center p-4">
 
+<!-- PAGE 1: LANDING -->
 <div id="pLanding" class="w-full max-w-md slide-up">
 <div class="glass rounded-3xl shadow-2xl p-8 border border-white/20 text-center">
 <div class="w-20 h-20 bg-emerald-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-xl"><i class="fas fa-shield-halved text-white text-3xl"></i></div>
-<h1 class="text-3xl font-bold text-slate-800">Rekber Proto</h1>
+<h1 class="text-3xl font-bold text-slate-800">Rekber Real-Time</h1>
 <p class="text-slate-500 mt-2">Chat + Foto Real-Time</p>
 <input type="text" id="inputName" placeholder="Nama Anda..." class="w-full px-5 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 outline-none text-center font-medium mt-6 mb-4">
 <div class="grid gap-3">
@@ -37,6 +38,7 @@ body{font-family:'Inter',sans-serif}
 </div>
 </div>
 
+<!-- PAGE 2: SELLER CREATE -->
 <div id="pSeller" class="w-full max-w-md hidden slide-up">
 <div class="glass rounded-3xl shadow-2xl p-8 border border-white/20">
 <button id="btnBack1" class="text-slate-400 hover:text-slate-600 mb-4 text-sm"><i class="fas fa-arrow-left mr-1"></i>Kembali</button>
@@ -52,6 +54,7 @@ body{font-family:'Inter',sans-serif}
 </div>
 </div>
 
+<!-- PAGE 3: BUYER JOIN -->
 <div id="pBuyer" class="w-full max-w-md hidden slide-up">
 <div class="glass rounded-3xl shadow-2xl p-8 border border-white/20">
 <button id="btnBack2" class="text-slate-400 hover:text-slate-600 mb-4 text-sm"><i class="fas fa-arrow-left mr-1"></i>Kembali</button>
@@ -65,6 +68,7 @@ body{font-family:'Inter',sans-serif}
 </div>
 </div>
 
+<!-- PAGE 4: WAITING -->
 <div id="pWait" class="w-full max-w-md hidden slide-up">
 <div class="glass rounded-3xl shadow-2xl p-8 border border-white/20 text-center">
 <h2 class="text-xl font-bold text-slate-800 mb-2">Room Dibuat!</h2>
@@ -82,6 +86,7 @@ body{font-family:'Inter',sans-serif}
 </div>
 </div>
 
+<!-- PAGE 5: CHAT -->
 <div id="pChat" class="w-full max-w-2xl hidden slide-up h-[92vh]">
 <div class="glass rounded-3xl shadow-2xl border border-white/20 h-full flex flex-col overflow-hidden">
 <div class="bg-white/90 border-b border-slate-100 p-4 flex items-center justify-between shrink-0">
@@ -100,6 +105,7 @@ body{font-family:'Inter',sans-serif}
 </div>
 </div>
 
+<!-- PREVIEW MODAL -->
 <div id="pModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
 <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-4 slide-up">
 <h3 class="font-bold text-slate-800 mb-3">Kirim Foto</h3>
@@ -108,20 +114,24 @@ body{font-family:'Inter',sans-serif}
 </div>
 </div>
 
-<div id="lightbox" onclick="this.style.display='none'"><img id="lImg" src="" alt="Full view" style="max-width:90vw;max-height:80vh;border-radius:8px"><p class="text-white/70 text-sm mt-4">Klik untuk tutup</p></div>
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="this.style.display='none'" style="position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:100;display:none;align-items:center;justify-content:center;flex-direction:column">
+<img id="lImg" src="" alt="Full view" style="max-width:90vw;max-height:80vh;border-radius:8px">
+<p class="text-white/70 text-sm mt-4">Klik untuk tutup</p>
+</div>
 
 <script>
-// Supabase config
+// ===== SUPABASE CONFIG =====
 const SB_URL='https://nswpbkxvbadubviyteik.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zd3Bia3h2YmFkdWJ2aXl0ZWlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTQ2NzAsImV4cCI6MjA5NDczMDY3MH0.C3KuTUpXOZ0PIqQtlrj9KeGHhH14wedRsF8aSAZ1K7E';
 const sb=window.supabase.createClient(SB_URL,SB_KEY);
 
-// State
+// ===== STATE =====
 let myName='',myRole='',roomCode='';
-let myId='u'+Date.now()+Math.random().toString(36).slice(2,5);
+let myId='u'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
 let ch1=null,ch2=null,sf=null;
 
-// Helper: show/hide pages
+// ===== HELPERS =====
 function show(id){
   document.getElementById('pLanding').classList.add('hidden');
   document.getElementById('pSeller').classList.add('hidden');
@@ -131,7 +141,19 @@ function show(id){
   document.getElementById(id).classList.remove('hidden');
 }
 
-// Event: Seller button
+function genCode(){
+  document.getElementById('cCode').value=Math.floor(1000+Math.random()*9000).toString();
+}
+
+function esc(t){
+  const d=document.createElement('div');
+  d.textContent=t;
+  return d.innerHTML;
+}
+
+// ===== EVENT HANDLERS =====
+
+// Seller button
 function onSeller(){
   myName=document.getElementById('inputName').value.trim();
   if(!myName){alert('Isi nama dulu!');return}
@@ -140,7 +162,7 @@ function onSeller(){
   genCode();
 }
 
-// Event: Buyer button
+// Buyer button
 function onBuyer(){
   myName=document.getElementById('inputName').value.trim();
   if(!myName){alert('Isi nama dulu!');return}
@@ -148,15 +170,10 @@ function onBuyer(){
   show('pBuyer');
 }
 
-// Event: Back button
+// Back button
 function onBack(){show('pLanding')}
 
-// Generate random code
-function genCode(){
-  document.getElementById('cCode').value=Math.floor(1000+Math.random()*9000).toString();
-}
-
-// Event: Create room
+// Create room (Seller)
 async function onCreate(e){
   e.preventDefault();
   roomCode=document.getElementById('cCode').value.trim();
@@ -164,42 +181,88 @@ async function onCreate(e){
   const price=parseInt(document.getElementById('cPrice').value);
   if(roomCode.length!==4){alert('Kode harus 4 digit!');return}
   try{
-    const{data:x}=await sb.from('rooms').select('code').eq('code',roomCode).single();
-    if(x){alert('Kode sudah dipakai!');return}
-    await sb.from('rooms').insert({code:roomCode,seller_name:myName,seller_id:myId,escrow_status:'wait',escrow_item:item,escrow_price:price});
+    // Check if room exists
+    const{data:existing}=await sb.from('rooms').select('*').eq('code',roomCode);
+    if(existing&&existing.length>0){alert('Kode sudah dipakai!');return}
+    // Create room
+    const{error}=await sb.from('rooms').insert({
+      code:roomCode,
+      seller_name:myName,
+      seller_id:myId,
+      escrow_status:'waiting_buyer',
+      escrow_item:item,
+      escrow_price:price
+    });
+    if(error)throw error;
+    // Show waiting page
     document.getElementById('dCode').textContent=roomCode;
     show('pWait');
-    ch1=sb.channel('w'+roomCode).on('postgres_changes',{event:'UPDATE',schema:'public',table:'rooms',filter:'code=eq.'+roomCode},(p)=>{
-      if(p.new.buyer_id)goChat();
-    }).subscribe();
-    const{data:rm}=await sb.from('rooms').select('*').eq('code',roomCode).single();
-    if(rm&&rm.buyer_id)goChat();
-  }catch(err){console.error(err);alert('Gagal buat room: '+err.message)}
+    // Listen for buyer
+    ch1=sb.channel('wait_'+roomCode)
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'rooms',filter:'code=eq.'+roomCode},(payload)=>{
+        if(payload.new.buyer_id){
+          goChat();
+        }
+      })
+      .subscribe();
+    // Check if buyer already joined
+    const{data:room}=await sb.from('rooms').select('*').eq('code',roomCode).single();
+    if(room&&room.buyer_id){
+      goChat();
+    }
+  }catch(err){
+    console.error('Create error:',err);
+    alert('Gagal buat room: '+err.message);
+  }
 }
 
-// Event: Join room
+// Join room (Buyer)
 async function onJoin(e){
   e.preventDefault();
   roomCode=document.getElementById('jCode').value.trim();
   if(roomCode.length!==4){alert('Kode harus 4 digit!');return}
   try{
-    const{data:rm,error}=await sb.from('rooms').select('*').eq('code',roomCode).single();
-    if(error||!rm){alert('Room tidak ditemukan!');return}
-    if(rm.buyer_id){alert('Room sudah penuh!');return}
-    await sb.from('rooms').update({buyer_name:myName,buyer_id:myId,escrow_status:'chat'}).eq('code',roomCode);
+    // Get room
+    const{data:room,error}=await sb.from('rooms').select('*').eq('code',roomCode).single();
+    if(error){
+      console.error('Join error:',error);
+      alert('Room tidak ditemukan! Pastikan kode benar.');
+      return;
+    }
+    if(!room){
+      alert('Room tidak ditemukan! Pastikan kode benar.');
+      return;
+    }
+    if(room.buyer_id){
+      alert('Room sudah penuh!');
+      return;
+    }
+    // Update room with buyer
+    const{error:updErr}=await sb.from('rooms').update({
+      buyer_name:myName,
+      buyer_id:myId,
+      escrow_status:'negotiating'
+    }).eq('code',roomCode);
+    if(updErr)throw updErr;
+    // Go to chat
     goChat();
-  }catch(err){console.error(err);alert('Gagal gabung: '+err.message)}
+  }catch(err){
+    console.error('Join error:',err);
+    alert('Gagal gabung: '+err.message);
+  }
 }
 
-// Event: Cancel room
+// Cancel room
 async function onCancel(){
   if(!confirm('Yakin batalkan room?'))return;
   if(ch1)ch1.unsubscribe();
-  await sb.from('rooms').delete().eq('code',roomCode);
+  try{
+    await sb.from('rooms').delete().eq('code',roomCode);
+  }catch(e){console.error(e)}
   show('pLanding');
 }
 
-// Event: Leave chat
+// Leave chat
 async function onLeave(){
   if(!confirm('Yakin keluar?'))return;
   if(ch1)ch1.unsubscribe();
@@ -208,7 +271,7 @@ async function onLeave(){
   location.reload();
 }
 
-// Go to chat
+// Go to chat page
 async function goChat(){
   if(ch1)ch1.unsubscribe();
   show('pChat');
@@ -218,25 +281,36 @@ async function goChat(){
     ?'px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px] uppercase'
     :'px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold text-[10px] uppercase';
   await loadMsgs();
-  ch1=sb.channel('r'+roomCode).on('postgres_changes',{event:'UPDATE',schema:'public',table:'rooms',filter:'code=eq.'+roomCode},()=>{}).subscribe();
-  ch2=sb.channel('m'+roomCode).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'room_code=eq.'+roomCode},(p)=>{
-    addMsg(p.new);
-  }).subscribe();
+  // Listen room updates
+  ch1=sb.channel('room_'+roomCode)
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'rooms',filter:'code=eq.'+roomCode},()=>{})
+    .subscribe();
+  // Listen new messages
+  ch2=sb.channel('msg_'+roomCode)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'room_code=eq.'+roomCode},(payload)=>{
+      addMsg(payload.new);
+    })
+    .subscribe();
 }
 
 // Load messages
 async function loadMsgs(){
-  const{data:ms}=await sb.from('messages').select('*').eq('room_code',roomCode).order('created_at',{ascending:true});
-  const box=document.getElementById('msgs');
-  box.innerHTML='';
-  if(!ms||ms.length===0){
-    box.innerHTML='<div class="text-center py-10 text-slate-400"><i class="fas fa-comments text-4xl mb-3 opacity-20"></i><p class="text-sm">Chat dimulai...</p></div>';
-    return;
+  try{
+    const{data:msgs,error}=await sb.from('messages').select('*').eq('room_code',roomCode).order('created_at',{ascending:true});
+    if(error)throw error;
+    const box=document.getElementById('msgs');
+    box.innerHTML='';
+    if(!msgs||msgs.length===0){
+      box.innerHTML='<div class="text-center py-10 text-slate-400"><i class="fas fa-comments text-4xl mb-3 opacity-20"></i><p class="text-sm">Chat dimulai...</p></div>';
+      return;
+    }
+    msgs.forEach(m=>addMsg(m));
+  }catch(err){
+    console.error('Load msgs error:',err);
   }
-  ms.forEach(m=>addMsg(m));
 }
 
-// Add message to chat
+// Add message to UI
 function addMsg(m){
   const box=document.getElementById('msgs');
   if(box.querySelector('.fa-comments'))box.innerHTML='';
@@ -260,9 +334,20 @@ async function onSend(e){
   const txt=inp.value.trim();
   if(!txt)return;
   try{
-    await sb.from('messages').insert({room_code:roomCode,text:txt,sender_id:myId,sender_name:myName,role:myRole,type:'chat'});
+    const{error}=await sb.from('messages').insert({
+      room_code:roomCode,
+      text:txt,
+      sender_id:myId,
+      sender_name:myName,
+      role:myRole,
+      type:'chat'
+    });
+    if(error)throw error;
     inp.value='';
-  }catch(err){console.error(err)}
+  }catch(err){
+    console.error('Send error:',err);
+    alert('Gagal kirim pesan: '+err.message);
+  }
 }
 
 // Select file
@@ -300,11 +385,20 @@ async function upImg(){
     const{data,error}=await sb.storage.from('chat-images').upload(fn,sf,{cacheControl:'3600',upsert:false});
     if(error)throw error;
     const{data:u}=sb.storage.from('chat-images').getPublicUrl(fn);
-    await sb.from('messages').insert({room_code:roomCode,text:u.publicUrl,sender_id:myId,sender_name:myName,role:myRole,type:'image'});
+    const{error:msgErr}=await sb.from('messages').insert({
+      room_code:roomCode,
+      text:u.publicUrl,
+      sender_id:myId,
+      sender_name:myName,
+      role:myRole,
+      type:'image'
+    });
+    if(msgErr)throw msgErr;
     closeP();
     btn.disabled=false;
     btn.innerHTML='<i class="fas fa-paper-plane mr-1"></i>Kirim';
   }catch(err){
+    console.error('Upload error:',err);
     alert('Gagal upload: '+err.message);
     btn.disabled=false;
     btn.innerHTML='<i class="fas fa-paper-plane mr-1"></i>Kirim';
@@ -317,28 +411,23 @@ function openL(src){
   document.getElementById('lightbox').style.display='flex';
 }
 
-// Escape HTML
-function esc(t){
-  const d=document.createElement('div');
-  d.textContent=t;
-  return d.innerHTML;
-}
-
-// Attach all event listeners
-document.getElementById('btnSeller').addEventListener('click',onSeller);
-document.getElementById('btnBuyer').addEventListener('click',onBuyer);
-document.getElementById('btnBack1').addEventListener('click',onBack);
-document.getElementById('btnBack2').addEventListener('click',onBack);
-document.getElementById('btnRandom').addEventListener('click',genCode);
-document.getElementById('formCreate').addEventListener('submit',onCreate);
-document.getElementById('formJoin').addEventListener('submit',onJoin);
-document.getElementById('btnCancel').addEventListener('click',onCancel);
-document.getElementById('btnLeave').addEventListener('click',onLeave);
-document.getElementById('formChat').addEventListener('submit',onSend);
-document.getElementById('fIn').addEventListener('change',onFile);
-document.getElementById('btnAttach').addEventListener('click',function(){document.getElementById('fIn').click()});
-document.getElementById('btnCloseP').addEventListener('click',closeP);
-document.getElementById('btnUp').addEventListener('click',upImg);
+// ===== ATTACH EVENT LISTENERS =====
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('btnSeller').addEventListener('click',onSeller);
+  document.getElementById('btnBuyer').addEventListener('click',onBuyer);
+  document.getElementById('btnBack1').addEventListener('click',onBack);
+  document.getElementById('btnBack2').addEventListener('click',onBack);
+  document.getElementById('btnRandom').addEventListener('click',genCode);
+  document.getElementById('formCreate').addEventListener('submit',onCreate);
+  document.getElementById('formJoin').addEventListener('submit',onJoin);
+  document.getElementById('btnCancel').addEventListener('click',onCancel);
+  document.getElementById('btnLeave').addEventListener('click',onLeave);
+  document.getElementById('formChat').addEventListener('submit',onSend);
+  document.getElementById('fIn').addEventListener('change',onFile);
+  document.getElementById('btnAttach').addEventListener('click',function(){document.getElementById('fIn').click()});
+  document.getElementById('btnCloseP').addEventListener('click',closeP);
+  document.getElementById('btnUp').addEventListener('click',upImg);
+});
 </script>
 </body>
 </html>
