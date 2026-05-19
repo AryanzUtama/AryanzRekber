@@ -119,8 +119,22 @@ let ch1=null,ch2=null,sf=null;
 
 function show(id){document.querySelectorAll('[id^="p"]').forEach(e=>e.classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
 window.back=()=>show('pLanding');
-window.showSeller=()=>{n=document.getElementById('inputName').value.trim();if(!n){alert('Isi nama!');return}r='seller';genCode();show('pSeller')};
-window.showBuyer=()=>{n=document.getElementById('inputName').value.trim();if(!n){alert('Isi nama!');return}r='buyer';show('pBuyer')};
+
+window.showSeller=()=>{
+n=document.getElementById('inputName').value.trim();
+if(!n){alert('Isi nama!');return}
+r='seller';
+show('pSeller');
+genCode();
+};
+
+window.showBuyer=()=>{
+n=document.getElementById('inputName').value.trim();
+if(!n){alert('Isi nama!');return}
+r='buyer';
+show('pBuyer');
+};
+
 window.genCode=()=>{document.getElementById('cCode').value=Math.floor(1000+Math.random()*9000).toString()};
 
 window.createRoom=async(e)=>{
