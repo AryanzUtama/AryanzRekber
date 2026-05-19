@@ -31,19 +31,19 @@ body{font-family:'Inter',sans-serif}
 <p class="text-slate-500 mt-2">Chat + Foto Real-Time</p>
 <input type="text" id="inputName" placeholder="Nama Anda..." class="w-full px-5 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 outline-none text-center font-medium mt-6 mb-4">
 <div class="grid gap-3">
-<button onclick="showSeller()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-lg"><i class="fas fa-store mr-2"></i>Saya Seller</button>
-<button onclick="showBuyer()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg"><i class="fas fa-shopping-cart mr-2"></i>Saya Buyer</button>
+<button id="btnSeller" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-lg"><i class="fas fa-store mr-2"></i>Saya Seller</button>
+<button id="btnBuyer" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg"><i class="fas fa-shopping-cart mr-2"></i>Saya Buyer</button>
 </div>
 </div>
 </div>
 
 <div id="pSeller" class="w-full max-w-md hidden slide-up">
 <div class="glass rounded-3xl shadow-2xl p-8 border border-white/20">
-<button onclick="back()" class="text-slate-400 hover:text-slate-600 mb-4 text-sm"><i class="fas fa-arrow-left mr-1"></i>Kembali</button>
+<button id="btnBack1" class="text-slate-400 hover:text-slate-600 mb-4 text-sm"><i class="fas fa-arrow-left mr-1"></i>Kembali</button>
 <h2 class="text-xl font-bold text-slate-800 mb-4">Buat Room</h2>
-<form onsubmit="createRoom(event)">
+<form id="formCreate">
 <div class="space-y-3">
-<div><label class="text-sm font-semibold text-slate-700">Kode (4 Digit)</label><input type="text" id="cCode" maxlength="4" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 outline-none text-center text-2xl font-bold tracking-[0.4em] mt-1" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)"><button type="button" onclick="genCode()" class="text-xs text-emerald-600 mt-1 hover:underline"><i class="fas fa-random mr-1"></i>Random</button></div>
+<div><label class="text-sm font-semibold text-slate-700">Kode (4 Digit)</label><input type="text" id="cCode" maxlength="4" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 outline-none text-center text-2xl font-bold tracking-[0.4em] mt-1" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)"><button type="button" id="btnRandom" class="text-xs text-emerald-600 mt-1 hover:underline"><i class="fas fa-random mr-1"></i>Random</button></div>
 <div><label class="text-sm font-semibold text-slate-700">Barang</label><input type="text" id="cItem" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 outline-none mt-1"></div>
 <div><label class="text-sm font-semibold text-slate-700">Harga (Rp)</label><input type="number" id="cPrice" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 outline-none mt-1"></div>
 <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg"><i class="fas fa-plus-circle mr-2"></i>Buat Room</button>
@@ -54,9 +54,9 @@ body{font-family:'Inter',sans-serif}
 
 <div id="pBuyer" class="w-full max-w-md hidden slide-up">
 <div class="glass rounded-3xl shadow-2xl p-8 border border-white/20">
-<button onclick="back()" class="text-slate-400 hover:text-slate-600 mb-4 text-sm"><i class="fas fa-arrow-left mr-1"></i>Kembali</button>
+<button id="btnBack2" class="text-slate-400 hover:text-slate-600 mb-4 text-sm"><i class="fas fa-arrow-left mr-1"></i>Kembali</button>
 <h2 class="text-xl font-bold text-slate-800 mb-4">Gabung Room</h2>
-<form onsubmit="joinRoom(event)">
+<form id="formJoin">
 <div class="space-y-3">
 <div><label class="text-sm font-semibold text-slate-700">Kode Room</label><input type="text" id="jCode" maxlength="4" required class="w-full px-4 py-4 rounded-xl border border-slate-200 focus:border-blue-500 outline-none text-center text-3xl font-bold tracking-[0.5em] mt-1" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)"></div>
 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg"><i class="fas fa-sign-in-alt mr-2"></i>Gabung</button>
@@ -78,7 +78,7 @@ body{font-family:'Inter',sans-serif}
 <div class="w-full bg-slate-100 rounded-full h-2 mb-3"><div class="bg-emerald-500 h-2 rounded-full" style="width:50%"></div></div>
 <div class="flex justify-between"><span class="text-sm font-medium text-slate-600">Buyer</span><span id="wStatus" class="text-slate-400 text-sm"><i class="fas fa-circle text-[8px] mr-1"></i>Menunggu...</span></div>
 </div>
-<button onclick="cancel()" class="text-red-500 hover:text-red-600 text-sm font-bold"><i class="fas fa-trash-alt mr-1"></i>Batalkan</button>
+<button id="btnCancel" class="text-red-500 hover:text-red-600 text-sm font-bold"><i class="fas fa-trash-alt mr-1"></i>Batalkan</button>
 </div>
 </div>
 
@@ -86,13 +86,13 @@ body{font-family:'Inter',sans-serif}
 <div class="glass rounded-3xl shadow-2xl border border-white/20 h-full flex flex-col overflow-hidden">
 <div class="bg-white/90 border-b border-slate-100 p-4 flex items-center justify-between shrink-0">
 <div class="flex items-center gap-3"><div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center text-white shadow-lg"><i class="fas fa-shield-halved text-lg"></i></div><div><h3 class="font-bold text-slate-800 text-lg">Room #<span id="hCode"></span></h3><span id="hRole" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px] uppercase">Seller</span></div></div>
-<button onclick="leave()" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all flex items-center justify-center"><i class="fas fa-sign-out-alt"></i></button>
+<button id="btnLeave" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all flex items-center justify-center"><i class="fas fa-sign-out-alt"></i></button>
 </div>
 <div id="msgs" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/40" style="scroll-behavior:smooth"></div>
 <div class="bg-white border-t border-slate-100 p-4 shrink-0">
-<form onsubmit="sendMsg(event)" class="flex gap-2 items-center">
-<input type="file" id="fIn" accept="image/*" class="hidden" onchange="selFile(event)">
-<button type="button" onclick="document.getElementById('fIn').click()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-emerald-100 text-slate-500 hover:text-emerald-600 transition-all flex items-center justify-center shrink-0"><i class="fas fa-paperclip"></i></button>
+<form id="formChat" class="flex gap-2 items-center">
+<input type="file" id="fIn" accept="image/*" class="hidden">
+<button type="button" id="btnAttach" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-emerald-100 text-slate-500 hover:text-emerald-600 transition-all flex items-center justify-center shrink-0"><i class="fas fa-paperclip"></i></button>
 <input type="text" id="mIn" placeholder="Ketik pesan..." class="flex-1 px-5 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 outline-none text-sm bg-slate-50">
 <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white w-12 h-12 rounded-xl shadow-lg transition-all flex items-center justify-center shrink-0"><i class="fas fa-paper-plane"></i></button>
 </form>
@@ -104,147 +104,241 @@ body{font-family:'Inter',sans-serif}
 <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-4 slide-up">
 <h3 class="font-bold text-slate-800 mb-3">Kirim Foto</h3>
 <img id="pImg" class="w-full rounded-xl mb-3 max-h-64 object-contain bg-slate-100">
-<div class="flex gap-2"><button onclick="closeP()" class="flex-1 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50">Batal</button><button onclick="upImg()" id="bUp" class="flex-1 py-2 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700"><i class="fas fa-paper-plane mr-1"></i>Kirim</button></div>
+<div class="flex gap-2"><button id="btnCloseP" class="flex-1 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50">Batal</button><button id="btnUp" class="flex-1 py-2 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700"><i class="fas fa-paper-plane mr-1"></i>Kirim</button></div>
 </div>
 </div>
 
-<div id="lightbox" onclick="closeL()"><img id="lImg" src="" alt="Full view"><p class="text-white/70 text-sm mt-4">Klik untuk tutup</p></div>
+<div id="lightbox" onclick="this.style.display='none'"><img id="lImg" src="" alt="Full view" style="max-width:90vw;max-height:80vh;border-radius:8px"><p class="text-white/70 text-sm mt-4">Klik untuk tutup</p></div>
 
 <script>
-const URL='https://nswpbkxvbadubviyteik.supabase.co';
-const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zd3Bia3h2YmFkdWJ2aXl0ZWlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTQ2NzAsImV4cCI6MjA5NDczMDY3MH0.C3KuTUpXOZ0PIqQtlrj9KeGHhH14wedRsF8aSAZ1K7E';
-const sb=supabase.createClient(URL,KEY);
-let n='',r='',rc='',id='u'+Date.now()+Math.random().toString(36).slice(2,5);
+// Supabase config
+const SB_URL='https://nswpbkxvbadubviyteik.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zd3Bia3h2YmFkdWJ2aXl0ZWlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTQ2NzAsImV4cCI6MjA5NDczMDY3MH0.C3KuTUpXOZ0PIqQtlrj9KeGHhH14wedRsF8aSAZ1K7E';
+const sb=window.supabase.createClient(SB_URL,SB_KEY);
+
+// State
+let myName='',myRole='',roomCode='';
+let myId='u'+Date.now()+Math.random().toString(36).slice(2,5);
 let ch1=null,ch2=null,sf=null;
 
-function show(id){document.querySelectorAll('[id^="p"]').forEach(e=>e.classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
-window.back=()=>show('pLanding');
-
-window.showSeller=()=>{
-n=document.getElementById('inputName').value.trim();
-if(!n){alert('Isi nama!');return}
-r='seller';
-show('pSeller');
-genCode();
-};
-
-window.showBuyer=()=>{
-n=document.getElementById('inputName').value.trim();
-if(!n){alert('Isi nama!');return}
-r='buyer';
-show('pBuyer');
-};
-
-window.genCode=()=>{document.getElementById('cCode').value=Math.floor(1000+Math.random()*9000).toString()};
-
-window.createRoom=async(e)=>{
-e.preventDefault();
-rc=document.getElementById('cCode').value.trim();
-const item=document.getElementById('cItem').value.trim();
-const price=parseInt(document.getElementById('cPrice').value);
-if(rc.length!==4){alert('Kode 4 digit!');return}
-try{
-const{data:x}=await sb.from('rooms').select('code').eq('code',rc).single();
-if(x){alert('Kode dipakai!');return}
-await sb.from('rooms').insert({code:rc,seller_name:n,seller_id:id,escrow_status:'wait',escrow_item:item,escrow_price:price});
-document.getElementById('dCode').textContent=rc;
-show('pWait');
-ch1=sb.channel('w'+rc).on('postgres_changes',{event:'UPDATE',schema:'public',table:'rooms',filter:`code=eq.${rc}`},(p)=>{if(p.new.buyer_id)goChat()}).subscribe();
-const{data:rm}=await sb.from('rooms').select('*').eq('code',rc).single();
-if(rm&&rm.buyer_id)goChat();
-}catch(err){alert('Gagal: '+err.message)}
-};
-
-window.joinRoom=async(e)=>{
-e.preventDefault();
-rc=document.getElementById('jCode').value.trim();
-if(rc.length!==4){alert('Kode 4 digit!');return}
-try{
-const{data:rm,error}=await sb.from('rooms').select('*').eq('code',rc).single();
-if(error||!rm){alert('Room tidak ada!');return}
-if(rm.buyer_id){alert('Room penuh!');return}
-await sb.from('rooms').update({buyer_name:n,buyer_id:id,escrow_status:'chat'}).eq('code',rc);
-goChat();
-}catch(err){alert('Gagal: '+err.message)}
-};
-
-window.cancel=async()=>{if(!confirm('Yakin?'))return;if(ch1)ch1.unsubscribe();await sb.from('rooms').delete().eq('code',rc);show('pLanding')};
-window.leave=async()=>{if(!confirm('Yakin keluar?'))return;if(ch1)ch1.unsubscribe();if(ch2)ch2.unsubscribe();show('pLanding');location.reload()};
-
-window.goChat=async()=>{
-if(ch1)ch1.unsubscribe();
-show('pChat');
-document.getElementById('hCode').textContent=rc;
-document.getElementById('hRole').textContent=r.toUpperCase();
-document.getElementById('hRole').className=r==='seller'?'px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px] uppercase':'px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold text-[10px] uppercase';
-await loadM();
-ch1=sb.channel('r'+rc).on('postgres_changes',{event:'UPDATE',schema:'public',table:'rooms',filter:`code=eq.${rc}`},()=>{}).subscribe();
-ch2=sb.channel('m'+rc).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`room_code=eq.${rc}`},(p)=>{addM(p.new)}).subscribe();
-};
-
-async function loadM(){
-const{data:ms}=await sb.from('messages').select('*').eq('room_code',rc).order('created_at',{ascending:true});
-document.getElementById('msgs').innerHTML='';
-if(!ms||ms.length===0){document.getElementById('msgs').innerHTML='<div class="text-center py-10 text-slate-400"><i class="fas fa-comments text-4xl mb-3 opacity-20"></i><p class="text-sm">Chat dimulai...</p></div>';return}
-ms.forEach(m=>addM(m));
+// Helper: show/hide pages
+function show(id){
+  document.getElementById('pLanding').classList.add('hidden');
+  document.getElementById('pSeller').classList.add('hidden');
+  document.getElementById('pBuyer').classList.add('hidden');
+  document.getElementById('pWait').classList.add('hidden');
+  document.getElementById('pChat').classList.add('hidden');
+  document.getElementById(id).classList.remove('hidden');
 }
 
-function addM(m){
-const box=document.getElementById('msgs');
-if(box.querySelector('.fa-comments'))box.innerHTML='';
-const t=new Date(m.created_at).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
-if(m.type==='system'){
-box.innerHTML+=`<div class="flex justify-center my-2"><span class="msg-system">${esc(m.text)}</span></div>`;
-}else if(m.type==='image'){
-const isMe=m.sender_id===id;
-box.innerHTML+=`<div class="flex ${isMe?'justify-end':'justify-start'} mb-3"><div class="max-w-[80%] ${isMe?'msg-me':'msg-them'} px-3 py-2 shadow-sm"><div class="text-[10px] opacity-80 mb-1"><b>${esc(m.sender_name)}</b> <span class="${m.role==='seller'?'text-emerald-300':'text-blue-300'}">(${m.role})</span></div><img src="${m.text}" onclick="openL('${m.text}')" class="chat-img block" loading="lazy"><div class="text-[10px] opacity-60 mt-1 text-right">${t}</div></div></div>`;
-}else{
-const isMe=m.sender_id===id;
-box.innerHTML+=`<div class="flex ${isMe?'justify-end':'justify-start'} mb-3"><div class="max-w-[80%] ${isMe?'msg-me':'msg-them'} px-4 py-2.5 shadow-sm"><div class="text-[10px] opacity-80 mb-0.5"><b>${esc(m.sender_name)}</b> <span class="${m.role==='seller'?'text-emerald-300':'text-blue-300'}">(${m.role})</span></div><div class="text-sm leading-relaxed">${esc(m.text)}</div><div class="text-[10px] opacity-60 mt-1 text-right">${t}</div></div></div>`;
-}
-box.scrollTop=box.scrollHeight;
+// Event: Seller button
+function onSeller(){
+  myName=document.getElementById('inputName').value.trim();
+  if(!myName){alert('Isi nama dulu!');return}
+  myRole='seller';
+  show('pSeller');
+  genCode();
 }
 
-window.sendMsg=async(e)=>{
-e.preventDefault();
-const inp=document.getElementById('mIn');
-const txt=inp.value.trim();
-if(!txt)return;
-try{await sb.from('messages').insert({room_code:rc,text:txt,sender_id:id,sender_name:n,role:r,type:'chat'});inp.value=''}catch(err){console.error(err)}
-};
+// Event: Buyer button
+function onBuyer(){
+  myName=document.getElementById('inputName').value.trim();
+  if(!myName){alert('Isi nama dulu!');return}
+  myRole='buyer';
+  show('pBuyer');
+}
 
-window.selFile=(e)=>{
-const f=e.target.files[0];
-if(!f)return;
-if(!f.type.startsWith('image/')){alert('Hanya gambar!');return}
-if(f.size>5*1024*1024){alert('Max 5MB!');return}
-sf=f;
-const rd=new FileReader();
-rd.onload=(ev)=>{document.getElementById('pImg').src=ev.target.result;document.getElementById('pModal').classList.remove('hidden');document.getElementById('pModal').classList.add('flex');document.getElementById('bUp').disabled=false;};
-rd.readAsDataURL(f);
-e.target.value='';
-};
+// Event: Back button
+function onBack(){show('pLanding')}
 
-window.closeP=()=>{document.getElementById('pModal').classList.add('hidden');document.getElementById('pModal').classList.remove('flex');sf=null;};
+// Generate random code
+function genCode(){
+  document.getElementById('cCode').value=Math.floor(1000+Math.random()*9000).toString();
+}
 
-window.upImg=async()=>{
-if(!sf||!rc)return;
-const btn=document.getElementById('bUp');
-btn.disabled=true;
-btn.innerHTML='<i class="fas fa-spinner fa-spin mr-1"></i>...';
-const fn=`${rc}_${Date.now()}_${sf.name.replace(/[^a-zA-Z0-9.]/g,'_')}`;
-try{
-const{data,error}=await sb.storage.from('chat-images').upload(fn,sf,{cacheControl:'3600',upsert:false});
-if(error)throw error;
-const{data:u}=sb.storage.from('chat-images').getPublicUrl(fn);
-await sb.from('messages').insert({room_code:rc,text:u.publicUrl,sender_id:id,sender_name:n,role:r,type:'image'});
-closeP();
-}catch(err){alert('Gagal: '+err.message);btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane mr-1"></i>Kirim'}
-};
+// Event: Create room
+async function onCreate(e){
+  e.preventDefault();
+  roomCode=document.getElementById('cCode').value.trim();
+  const item=document.getElementById('cItem').value.trim();
+  const price=parseInt(document.getElementById('cPrice').value);
+  if(roomCode.length!==4){alert('Kode harus 4 digit!');return}
+  try{
+    const{data:x}=await sb.from('rooms').select('code').eq('code',roomCode).single();
+    if(x){alert('Kode sudah dipakai!');return}
+    await sb.from('rooms').insert({code:roomCode,seller_name:myName,seller_id:myId,escrow_status:'wait',escrow_item:item,escrow_price:price});
+    document.getElementById('dCode').textContent=roomCode;
+    show('pWait');
+    ch1=sb.channel('w'+roomCode).on('postgres_changes',{event:'UPDATE',schema:'public',table:'rooms',filter:'code=eq.'+roomCode},(p)=>{
+      if(p.new.buyer_id)goChat();
+    }).subscribe();
+    const{data:rm}=await sb.from('rooms').select('*').eq('code',roomCode).single();
+    if(rm&&rm.buyer_id)goChat();
+  }catch(err){console.error(err);alert('Gagal buat room: '+err.message)}
+}
 
-window.openL=(src)=>{document.getElementById('lImg').src=src;document.getElementById('lightbox').style.display='flex'};
-window.closeL=()=>{document.getElementById('lightbox').style.display='none';document.getElementById('lImg').src=''};
-function esc(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
+// Event: Join room
+async function onJoin(e){
+  e.preventDefault();
+  roomCode=document.getElementById('jCode').value.trim();
+  if(roomCode.length!==4){alert('Kode harus 4 digit!');return}
+  try{
+    const{data:rm,error}=await sb.from('rooms').select('*').eq('code',roomCode).single();
+    if(error||!rm){alert('Room tidak ditemukan!');return}
+    if(rm.buyer_id){alert('Room sudah penuh!');return}
+    await sb.from('rooms').update({buyer_name:myName,buyer_id:myId,escrow_status:'chat'}).eq('code',roomCode);
+    goChat();
+  }catch(err){console.error(err);alert('Gagal gabung: '+err.message)}
+}
+
+// Event: Cancel room
+async function onCancel(){
+  if(!confirm('Yakin batalkan room?'))return;
+  if(ch1)ch1.unsubscribe();
+  await sb.from('rooms').delete().eq('code',roomCode);
+  show('pLanding');
+}
+
+// Event: Leave chat
+async function onLeave(){
+  if(!confirm('Yakin keluar?'))return;
+  if(ch1)ch1.unsubscribe();
+  if(ch2)ch2.unsubscribe();
+  show('pLanding');
+  location.reload();
+}
+
+// Go to chat
+async function goChat(){
+  if(ch1)ch1.unsubscribe();
+  show('pChat');
+  document.getElementById('hCode').textContent=roomCode;
+  document.getElementById('hRole').textContent=myRole.toUpperCase();
+  document.getElementById('hRole').className=myRole==='seller'
+    ?'px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px] uppercase'
+    :'px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold text-[10px] uppercase';
+  await loadMsgs();
+  ch1=sb.channel('r'+roomCode).on('postgres_changes',{event:'UPDATE',schema:'public',table:'rooms',filter:'code=eq.'+roomCode},()=>{}).subscribe();
+  ch2=sb.channel('m'+roomCode).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'room_code=eq.'+roomCode},(p)=>{
+    addMsg(p.new);
+  }).subscribe();
+}
+
+// Load messages
+async function loadMsgs(){
+  const{data:ms}=await sb.from('messages').select('*').eq('room_code',roomCode).order('created_at',{ascending:true});
+  const box=document.getElementById('msgs');
+  box.innerHTML='';
+  if(!ms||ms.length===0){
+    box.innerHTML='<div class="text-center py-10 text-slate-400"><i class="fas fa-comments text-4xl mb-3 opacity-20"></i><p class="text-sm">Chat dimulai...</p></div>';
+    return;
+  }
+  ms.forEach(m=>addMsg(m));
+}
+
+// Add message to chat
+function addMsg(m){
+  const box=document.getElementById('msgs');
+  if(box.querySelector('.fa-comments'))box.innerHTML='';
+  const t=new Date(m.created_at).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  if(m.type==='system'){
+    box.innerHTML+='<div class="flex justify-center my-2"><span class="msg-system">'+esc(m.text)+'</span></div>';
+  }else if(m.type==='image'){
+    const isMe=m.sender_id===myId;
+    box.innerHTML+='<div class="flex '+(isMe?'justify-end':'justify-start')+' mb-3"><div class="max-w-[80%] '+(isMe?'msg-me':'msg-them')+' px-3 py-2 shadow-sm"><div class="text-[10px] opacity-80 mb-1"><b>'+esc(m.sender_name)+'</b> <span class="'+(m.role==='seller'?'text-emerald-300':'text-blue-300')+'">('+m.role+')</span></div><img src="'+m.text+'" onclick="openL(this.src)" class="chat-img block" loading="lazy"><div class="text-[10px] opacity-60 mt-1 text-right">'+t+'</div></div></div>';
+  }else{
+    const isMe=m.sender_id===myId;
+    box.innerHTML+='<div class="flex '+(isMe?'justify-end':'justify-start')+' mb-3"><div class="max-w-[80%] '+(isMe?'msg-me':'msg-them')+' px-4 py-2.5 shadow-sm"><div class="text-[10px] opacity-80 mb-0.5"><b>'+esc(m.sender_name)+'</b> <span class="'+(m.role==='seller'?'text-emerald-300':'text-blue-300')+'">('+m.role+')</span></div><div class="text-sm leading-relaxed">'+esc(m.text)+'</div><div class="text-[10px] opacity-60 mt-1 text-right">'+t+'</div></div></div>';
+  }
+  box.scrollTop=box.scrollHeight;
+}
+
+// Send text message
+async function onSend(e){
+  e.preventDefault();
+  const inp=document.getElementById('mIn');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  try{
+    await sb.from('messages').insert({room_code:roomCode,text:txt,sender_id:myId,sender_name:myName,role:myRole,type:'chat'});
+    inp.value='';
+  }catch(err){console.error(err)}
+}
+
+// Select file
+function onFile(e){
+  const f=e.target.files[0];
+  if(!f)return;
+  if(!f.type.startsWith('image/')){alert('Hanya gambar!');return}
+  if(f.size>5*1024*1024){alert('Max 5MB!');return}
+  sf=f;
+  const rd=new FileReader();
+  rd.onload=function(ev){
+    document.getElementById('pImg').src=ev.target.result;
+    document.getElementById('pModal').classList.remove('hidden');
+    document.getElementById('pModal').classList.add('flex');
+  };
+  rd.readAsDataURL(f);
+  e.target.value='';
+}
+
+// Close preview
+function closeP(){
+  document.getElementById('pModal').classList.add('hidden');
+  document.getElementById('pModal').classList.remove('flex');
+  sf=null;
+}
+
+// Upload image
+async function upImg(){
+  if(!sf||!roomCode)return;
+  const btn=document.getElementById('btnUp');
+  btn.disabled=true;
+  btn.innerHTML='<i class="fas fa-spinner fa-spin mr-1"></i>...';
+  const fn=roomCode+'_'+Date.now()+'_'+sf.name.replace(/[^a-zA-Z0-9.]/g,'_');
+  try{
+    const{data,error}=await sb.storage.from('chat-images').upload(fn,sf,{cacheControl:'3600',upsert:false});
+    if(error)throw error;
+    const{data:u}=sb.storage.from('chat-images').getPublicUrl(fn);
+    await sb.from('messages').insert({room_code:roomCode,text:u.publicUrl,sender_id:myId,sender_name:myName,role:myRole,type:'image'});
+    closeP();
+    btn.disabled=false;
+    btn.innerHTML='<i class="fas fa-paper-plane mr-1"></i>Kirim';
+  }catch(err){
+    alert('Gagal upload: '+err.message);
+    btn.disabled=false;
+    btn.innerHTML='<i class="fas fa-paper-plane mr-1"></i>Kirim';
+  }
+}
+
+// Open lightbox
+function openL(src){
+  document.getElementById('lImg').src=src;
+  document.getElementById('lightbox').style.display='flex';
+}
+
+// Escape HTML
+function esc(t){
+  const d=document.createElement('div');
+  d.textContent=t;
+  return d.innerHTML;
+}
+
+// Attach all event listeners
+document.getElementById('btnSeller').addEventListener('click',onSeller);
+document.getElementById('btnBuyer').addEventListener('click',onBuyer);
+document.getElementById('btnBack1').addEventListener('click',onBack);
+document.getElementById('btnBack2').addEventListener('click',onBack);
+document.getElementById('btnRandom').addEventListener('click',genCode);
+document.getElementById('formCreate').addEventListener('submit',onCreate);
+document.getElementById('formJoin').addEventListener('submit',onJoin);
+document.getElementById('btnCancel').addEventListener('click',onCancel);
+document.getElementById('btnLeave').addEventListener('click',onLeave);
+document.getElementById('formChat').addEventListener('submit',onSend);
+document.getElementById('fIn').addEventListener('change',onFile);
+document.getElementById('btnAttach').addEventListener('click',function(){document.getElementById('fIn').click()});
+document.getElementById('btnCloseP').addEventListener('click',closeP);
+document.getElementById('btnUp').addEventListener('click',upImg);
 </script>
 </body>
 </html>
