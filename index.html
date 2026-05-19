@@ -9,248 +9,225 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        
-        .glass {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
-        
-        .message-bubble {
-            max-width: 80%;
-            word-wrap: break-word;
-        }
-        
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        @keyframes pulse-ring {
-            0% { transform: scale(0.8); opacity: 0.5; }
-            100% { transform: scale(2); opacity: 0; }
-        }
-        
-        .animate-pulse-ring::before {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 50%;
-            border: 2px solid #10b981;
-            animation: pulse-ring 2s infinite;
-        }
-        
-        .slide-up { animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        .glass { background: rgba(255,255,255,0.97); backdrop-filter: blur(12px); }
+        .msg-me { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border-radius: 18px 18px 4px 18px; }
+        .msg-them { background: white; color: #334155; border: 1px solid #e2e8f0; border-radius: 18px 18px 18px 4px; }
+        .msg-system { background: #f1f5f9; color: #64748b; font-size: 12px; padding: 6px 16px; border-radius: 999px; }
+        .slide-up { animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform: translateY(0); } }
+        .pulse-ring::before { content:''; position:absolute; inset:-6px; border-radius:50%; border:3px solid #10b981; animation: ring 2s infinite; }
+        @keyframes ring { 0%{transform:scale(0.8);opacity:0.6;} 100%{transform:scale(2);opacity:0;} }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 min-h-screen text-slate-800">
+<body class="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 min-h-screen text-slate-800 flex items-center justify-center p-4">
 
-    <!-- APP CONTAINER -->
-    <div id="app" class="min-h-screen flex items-center justify-center p-4">
-        
-        <!-- PAGE 1: LOGIN / JOIN -->
-        <div id="loginPage" class="w-full max-w-md slide-up">
-            <div class="glass rounded-2xl shadow-2xl p-8 border border-white/20">
-                <div class="text-center mb-8">
-                    <div class="w-16 h-16 bg-blue-600 rounded-xl mx-auto flex items-center justify-center mb-4 shadow-lg">
-                        <i class="fas fa-shield-halved text-white text-2xl"></i>
-                    </div>
-                    <h1 class="text-2xl font-bold text-slate-800">Rekber Real-Time</h1>
-                    <p class="text-slate-500 text-sm mt-1">Transaksi aman dengan escrow digital</p>
+    <!-- PAGE 1: LANDING (PILIH MODE) -->
+    <div id="pageLanding" class="w-full max-w-md slide-up">
+        <div class="glass rounded-3xl shadow-2xl p-8 border border-white/20">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-xl shadow-blue-600/30">
+                    <i class="fas fa-shield-halved text-white text-3xl"></i>
                 </div>
-
-                <form id="loginForm" class="space-y-5">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Nama Anda</label>
-                        <input type="text" id="userName" required placeholder="Masukkan nama..." 
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Peran Anda</label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="cursor-pointer">
-                                <input type="radio" name="role" value="buyer" class="peer hidden" checked>
-                                <div class="px-4 py-3 rounded-xl border-2 border-slate-200 peer-checked:border-blue-500 peer-checked:bg-blue-50 text-center transition-all">
-                                    <i class="fas fa-shopping-cart text-blue-500 mb-1"></i>
-                                    <div class="text-sm font-medium">Buyer</div>
-                                </div>
-                            </label>
-                            <label class="cursor-pointer">
-                                <input type="radio" name="role" value="seller" class="peer hidden">
-                                <div class="px-4 py-3 rounded-xl border-2 border-slate-200 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 text-center transition-all">
-                                    <i class="fas fa-store text-emerald-500 mb-1"></i>
-                                    <div class="text-sm font-medium">Seller</div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Kode Room (4 Digit)</label>
-                        <input type="text" id="roomCode" required maxlength="4" placeholder="Contoh: 7284" 
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-center text-2xl tracking-[0.5em] font-bold uppercase"
-                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,4)">
-                        <p class="text-xs text-slate-400 mt-2 text-center">Seller buat kode & bagikan ke Buyer</p>
-                    </div>
-
-                    <button type="submit" id="btnJoin"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] shadow-lg shadow-blue-600/30">
-                        <i class="fas fa-sign-in-alt mr-2"></i> Masuk Room
-                    </button>
-                </form>
+                <h1 class="text-3xl font-bold text-slate-800">Rekber Real-Time</h1>
+                <p class="text-slate-500 mt-2">Transaksi aman dengan escrow digital</p>
             </div>
-        </div>
 
-        <!-- PAGE 2: WAITING ROOM -->
-        <div id="waitingPage" class="w-full max-w-md hidden slide-up">
-            <div class="glass rounded-2xl shadow-2xl p-8 border border-white/20 text-center">
-                <div class="relative w-20 h-20 mx-auto mb-6">
-                    <div class="w-full h-full bg-blue-100 rounded-full flex items-center justify-center animate-pulse-ring relative">
-                        <i class="fas fa-hourglass-half text-blue-600 text-3xl"></i>
-                    </div>
-                </div>
-                <h2 class="text-xl font-bold text-slate-800 mb-2">Menunggu Lawan Transaksi...</h2>
-                <p class="text-slate-500 mb-6">Kode Room: <span id="waitingCode" class="font-mono font-bold text-blue-600 text-lg"></span></p>
-                
-                <div class="bg-slate-50 rounded-xl p-4 mb-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm text-slate-600">Anda (<span id="waitingRole"></span>)</span>
-                        <span class="text-emerald-500 text-sm"><i class="fas fa-check-circle mr-1"></i> Online</span>
-                    </div>
-                    <div class="w-full bg-slate-200 rounded-full h-2">
-                        <div class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: 50%"></div>
-                    </div>
-                    <div class="flex items-center justify-between mt-3">
-                        <span class="text-sm text-slate-600">Lawan</span>
-                        <span id="opponentStatus" class="text-slate-400 text-sm"><i class="fas fa-circle text-[8px] mr-1"></i> Menunggu...</span>
-                    </div>
-                </div>
+            <div class="space-y-3 mb-6">
+                <input type="text" id="inputName" placeholder="Nama Anda..." 
+                    class="w-full px-5 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-center font-medium">
+            </div>
 
-                <button onclick="leaveRoom()" class="text-red-500 hover:text-red-600 text-sm font-medium">
-                    <i class="fas fa-arrow-left mr-1"></i> Keluar Room
+            <div class="grid gap-4">
+                <button onclick="showSellerForm()" id="btnSeller"
+                    class="group w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-3">
+                    <i class="fas fa-store text-xl group-hover:scale-110 transition-transform"></i>
+                    <div class="text-left">
+                        <div class="text-lg">Saya Seller</div>
+                        <div class="text-xs font-normal opacity-90">Buat Room & Kode Transaksi</div>
+                    </div>
+                </button>
+
+                <button onclick="showBuyerForm()" id="btnBuyer"
+                    class="group w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-3">
+                    <i class="fas fa-shopping-cart text-xl group-hover:scale-110 transition-transform"></i>
+                    <div class="text-left">
+                        <div class="text-lg">Saya Buyer</div>
+                        <div class="text-xs font-normal opacity-90">Gabung Room dengan Kode</div>
+                    </div>
                 </button>
             </div>
         </div>
+    </div>
 
-        <!-- PAGE 3: CHAT ROOM -->
-        <div id="chatPage" class="w-full max-w-2xl hidden slide-up h-[90vh]">
-            <div class="glass rounded-2xl shadow-2xl border border-white/20 h-full flex flex-col overflow-hidden">
-                
-                <!-- HEADER -->
-                <div class="bg-white/80 border-b border-slate-100 p-4 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
-                            <i class="fas fa-shield-halved"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-slate-800">Room #<<span id="chatRoomCode"></span></h3>
-                            <div class="flex items-center gap-2 text-xs">
-                                <span id="buyerBadge" class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 hidden">Buyer</span>
-                                <span id="sellerBadge" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 hidden">Seller</span>
-                                <span id="onlineStatus" class="text-emerald-500"><i class="fas fa-circle text-[8px] mr-1"></i>Online</span>
-                            </div>
-                        </div>
+    <!-- PAGE 2: SELLER CREATE -->
+    <div id="pageSellerCreate" class="w-full max-w-md hidden slide-up">
+        <div class="glass rounded-3xl shadow-2xl p-8 border border-white/20">
+            <button onclick="backToLanding()" class="text-slate-400 hover:text-slate-600 mb-4 flex items-center gap-2 text-sm font-medium">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+            <h2 class="text-xl font-bold text-slate-800 mb-1">Buat Room Transaksi</h2>
+            <p class="text-slate-500 text-sm mb-6">Isi detail barang/jasa yang dijual</p>
+
+            <form id="formCreate" onsubmit="handleCreate(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700 block mb-1">Kode Room (4 Digit)</label>
+                        <input type="text" id="createCode" maxlength="4" required placeholder="Contoh: 7392"
+                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none text-center text-2xl font-bold tracking-[0.4em]"
+                            oninput="this.value = this.value.replace(/[^0-9]/g,'').slice(0,4)">
+                        <button type="button" onclick="generateCode()" class="text-xs text-emerald-600 font-medium mt-1 hover:underline">
+                            <i class="fas fa-random mr-1"></i>Generate Random
+                        </button>
                     </div>
-                    <button onclick="leaveRoom()" class="text-slate-400 hover:text-red-500 transition-colors p-2">
-                        <i class="fas fa-sign-out-alt text-lg"></i>
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700 block mb-1">Nama Barang / Jasa</label>
+                        <input type="text" id="createItem" required placeholder="Contoh: Akun Mobile Legends S5"
+                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700 block mb-1">Harga (Rp)</label>
+                        <input type="number" id="createPrice" required placeholder="150000"
+                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-600/20 transition-all mt-2">
+                        <i class="fas fa-plus-circle mr-2"></i>Buat Room Sekarang
                     </button>
                 </div>
+            </form>
+        </div>
+    </div>
 
-                <!-- ESCROW STATUS BAR -->
-                <div class="bg-slate-50 border-b border-slate-100 p-3">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status Rekber</span>
-                        <span id="escrowStatusText" class="text-xs font-bold px-2 py-1 rounded-full bg-yellow-100 text-yellow-700">Menunggu</span>
+    <!-- PAGE 3: BUYER JOIN -->
+    <div id="pageBuyerJoin" class="w-full max-w-md hidden slide-up">
+        <div class="glass rounded-3xl shadow-2xl p-8 border border-white/20">
+            <button onclick="backToLanding()" class="text-slate-400 hover:text-slate-600 mb-4 flex items-center gap-2 text-sm font-medium">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+            <h2 class="text-xl font-bold text-slate-800 mb-1">Gabung Room</h2>
+            <p class="text-slate-500 text-sm mb-6">Masukkan kode 4 digit dari Seller</p>
+
+            <form id="formJoin" onsubmit="handleJoin(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700 block mb-1">Kode Room</label>
+                        <input type="text" id="joinCode" maxlength="4" required placeholder="----"
+                            class="w-full px-4 py-4 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-center text-3xl font-bold tracking-[0.5em]"
+                            oninput="this.value = this.value.replace(/[^0-9]/g,'').slice(0,4)">
                     </div>
-                    <div class="flex items-center gap-1">
-                        <div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
-                            <div id="escrowProgress" class="h-full bg-blue-500 transition-all duration-500" style="width: 0%"></div>
-                        </div>
-                    </div>
-                    <div class="flex justify-between mt-2 text-[10px] text-slate-400 font-medium">
-                        <span>Deal</span>
-                        <span>Bayar</span>
-                        <span>Kirim</span>
-                        <span>Terima</span>
-                        <span>Selesai</span>
-                    </div>
-                    
-                    <!-- ESCROW ACTIONS -->
-                    <div id="escrowActions" class="mt-3 flex gap-2">
-                        <!-- Dynamic buttons injected by JS -->
-                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-600/20 transition-all">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Gabung Room
+                    </button>
                 </div>
+            </form>
+        </div>
+    </div>
 
-                <!-- ESCROW DETAILS (Collapsible) -->
-                <div id="escrowDetails" class="bg-blue-50/50 border-b border-blue-100 p-3 text-sm hidden">
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <span class="text-xs text-slate-500">Barang:</span>
-                            <p id="detailItem" class="font-medium text-slate-700">-</p>
-                        </div>
-                        <div>
-                            <span class="text-xs text-slate-500">Harga:</span>
-                            <p id="detailPrice" class="font-medium text-slate-700">-</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- MESSAGES AREA -->
-                <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-hide bg-slate-50/30">
-                    <div class="text-center py-8 text-slate-400 text-sm">
-                        <i class="fas fa-comments text-3xl mb-2 opacity-30"></i>
-                        <p>Mulai chat dengan lawan transaksi Anda</p>
-                        <p class="text-xs mt-1">Semua pesan tersimpan real-time</p>
-                    </div>
-                </div>
-
-                <!-- INPUT AREA -->
-                <div class="bg-white border-t border-slate-100 p-4">
-                    <form id="chatForm" class="flex gap-2">
-                        <input type="text" id="messageInput" placeholder="Ketik pesan..." required
-                            class="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-sm">
-                        <button type="submit" 
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-xl transition-all transform hover:scale-105 shadow-lg shadow-blue-600/20">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </form>
+    <!-- PAGE 4: WAITING -->
+    <div id="pageWaiting" class="w-full max-w-md hidden slide-up">
+        <div class="glass rounded-3xl shadow-2xl p-8 border border-white/20 text-center">
+            <div class="relative w-24 h-24 mx-auto mb-6">
+                <div class="w-full h-full bg-emerald-100 rounded-full flex items-center justify-center pulse-ring relative">
+                    <i class="fas fa-hourglass-half text-emerald-600 text-3xl"></i>
                 </div>
             </div>
-        </div>
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Room Berhasil Dibuat!</h2>
+            <p class="text-slate-500 mb-6">Bagikan kode ini ke Buyer</p>
+            
+            <div class="bg-slate-100 rounded-2xl p-6 mb-6 border-2 border-dashed border-slate-300">
+                <div class="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">Kode Room</div>
+                <div id="displayCode" class="text-5xl font-black text-slate-800 tracking-[0.2em] font-mono">----</div>
+            </div>
 
-        <!-- SELLER SETUP MODAL -->
-        <div id="sellerSetupModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm slide-up">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">Detail Transaksi</h3>
-                <form id="sellerSetupForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama Barang/Jasa</label>
-                        <input type="text" id="itemName" required placeholder="Contoh: Akun Game Mobile Legends"
-                            class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 outline-none text-sm">
+            <div class="bg-white rounded-xl p-4 border border-slate-200 mb-6 text-left">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-slate-600">Status Seller (Anda)</span>
+                    <span class="text-emerald-600 text-sm font-bold"><i class="fas fa-check-circle mr-1"></i>Online</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2 mb-3">
+                    <div class="bg-emerald-500 h-2 rounded-full" style="width:50%"></div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-slate-600">Status Buyer</span>
+                    <span id="waitingBuyerStatus" class="text-slate-400 text-sm"><i class="fas fa-circle text-[8px] mr-1"></i>Menunggu...</span>
+                </div>
+            </div>
+
+            <button onclick="cancelRoom()" class="text-red-500 hover:text-red-600 text-sm font-bold">
+                <i class="fas fa-trash-alt mr-1"></i>Batalkan Room
+            </button>
+        </div>
+    </div>
+
+    <!-- PAGE 5: CHAT -->
+    <div id="pageChat" class="w-full max-w-2xl hidden slide-up h-[92vh]">
+        <div class="glass rounded-3xl shadow-2xl border border-white/20 h-full flex flex-col overflow-hidden">
+            <!-- Header -->
+            <div class="bg-white/90 border-b border-slate-100 p-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+                        <i class="fas fa-shield-halved text-lg"></i>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Harga (Rp)</label>
-                        <input type="number" id="itemPrice" required placeholder="100000"
-                            class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 outline-none text-sm">
+                        <h3 class="font-bold text-slate-800 text-lg">Room #<<span id="chatCode"></span></h3>
+                        <div class="flex items-center gap-2 text-xs mt-0.5">
+                            <span id="badgeRole" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px] uppercase">Seller</span>
+                            <span id="badgeOnline" class="text-emerald-500 font-medium"><i class="fas fa-circle text-[8px] mr-1"></i>Online</span>
+                        </div>
                     </div>
-                    <div class="flex gap-2 pt-2">
-                        <button type="button" onclick="closeSellerSetup()" class="flex-1 py-2 rounded-lg border border-slate-200 text-slate-600 text-sm hover:bg-slate-50">Batal</button>
-                        <button type="submit" class="flex-1 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700">Buat Room</button>
-                    </div>
+                </div>
+                <button onclick="leaveChat()" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all flex items-center justify-center">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+
+            <!-- Escrow Bar -->
+            <div class="bg-slate-50 border-b border-slate-100 p-3 shrink-0">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Rekber Status</span>
+                    <span id="escrowBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">Menunggu Buyer</span>
+                </div>
+                <div class="h-2 bg-slate-200 rounded-full overflow-hidden mb-1">
+                    <div id="escrowBar" class="h-full bg-blue-500 transition-all duration-700" style="width:10%"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-slate-400 font-bold uppercase mt-1">
+                    <span>Deal</span><span>Bayar</span><span>Kirim</span><span>Terima</span><span>Selesai</span>
+                </div>
+                
+                <div id="escrowInfo" class="mt-2 bg-white rounded-lg p-2 border border-slate-100 flex justify-between items-center text-sm">
+                    <div><span class="text-slate-400 text-xs">Barang:</span> <span id="infoItem" class="font-semibold text-slate-700">-</span></div>
+                    <div><span class="text-slate-400 text-xs">Harga:</span> <span id="infoPrice" class="font-bold text-emerald-600">-</span></div>
+                </div>
+
+                <div id="escrowButtons" class="mt-2 flex gap-2"></div>
+            </div>
+
+            <!-- Messages -->
+            <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/40" style="scroll-behavior: smooth;">
+                <div class="text-center py-10 text-slate-400">
+                    <i class="fas fa-comments text-4xl mb-3 opacity-20"></i>
+                    <p class="text-sm">Chat dimulai...</p>
+                </div>
+            </div>
+
+            <!-- Input -->
+            <div class="bg-white border-t border-slate-100 p-4 shrink-0">
+                <form id="formChat" onsubmit="sendMessage(event)" class="flex gap-2">
+                    <input type="text" id="inputMsg" placeholder="Ketik pesan..." required
+                        class="flex-1 px-5 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-sm bg-slate-50">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-xl shadow-lg shadow-blue-600/20 transition-all flex items-center justify-center shrink-0">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </form>
             </div>
         </div>
-
     </div>
 
-    <!-- FIREBASE SDK v9 Modular -->
+    <!-- FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, push, update, get, onDisconnect, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // Your Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDpQhIcitZwMMhQIHhpB9rp_k0EpBJT-2k",
             authDomain: "chat-real-time-32576.firebaseapp.com",
@@ -265,129 +242,345 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // STATE
-        let currentUser = null;
-        let currentRoom = null;
-        let roomListener = null;
-        let messagesListener = null;
-        let escrowListener = null;
+        // --- STATE ---
+        let myName = '';
+        let myRole = '';
+        let roomCode = '';
+        let myId = 'user_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+        let unsubRoom = null;
+        let unsubMsg = null;
 
-        // DOM Elements
-        const loginPage = document.getElementById('loginPage');
-        const waitingPage = document.getElementById('waitingPage');
-        const chatPage = document.getElementById('chatPage');
-        const sellerSetupModal = document.getElementById('sellerSetupModal');
-
-        // Navigation
-        function showPage(page) {
-            [loginPage, waitingPage, chatPage].forEach(p => p.classList.add('hidden'));
-            page.classList.remove('hidden');
+        // --- NAVIGASI ---
+        window.showPage = function(id) {
+            document.querySelectorAll('[id^="page"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
         }
 
-        // Login Handler
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        window.backToLanding = function() {
+            showPage('pageLanding');
+        }
+
+        window.showSellerForm = function() {
+            myName = document.getElementById('inputName').value.trim();
+            if (!myName) { alert('Isi nama Anda dulu!'); return; }
+            myRole = 'seller';
+            generateCode();
+            showPage('pageSellerCreate');
+        }
+
+        window.showBuyerForm = function() {
+            myName = document.getElementById('inputName').value.trim();
+            if (!myName) { alert('Isi nama Anda dulu!'); return; }
+            myRole = 'buyer';
+            showPage('pageBuyerJoin');
+        }
+
+        window.generateCode = function() {
+            const code = Math.floor(1000 + Math.random() * 9000).toString();
+            document.getElementById('createCode').value = code;
+        }
+
+        // --- SELLER: BUAT ROOM ---
+        window.handleCreate = async function(e) {
             e.preventDefault();
-            const name = document.getElementById('userName').value.trim();
-            const role = document.querySelector('input[name="role"]:checked').value;
-            const code = document.getElementById('roomCode').value.trim();
+            roomCode = document.getElementById('createCode').value.trim();
+            const item = document.getElementById('createItem').value.trim();
+            const price = parseInt(document.getElementById('createPrice').value);
 
-            if (code.length !== 4) {
-                alert('Kode harus 4 digit!');
-                return;
-            }
+            if (roomCode.length !== 4) { alert('Kode harus 4 digit!'); return; }
 
-            currentUser = { name, role, id: Date.now().toString() };
+            try {
+                const roomRef = ref(db, 'rooms/' + roomCode);
+                const snap = await get(roomRef);
+                if (snap.exists()) { alert('Kode sudah dipakai, ganti yang lain!'); return; }
 
-            if (role === 'seller') {
-                // Seller needs to setup transaction first
-                document.getElementById('sellerSetupModal').classList.remove('hidden');
-                document.getElementById('sellerSetupModal').classList.add('flex');
-                currentRoom = { code, seller: currentUser };
-            } else {
-                // Buyer joins directly
-                await joinRoom(code, 'buyer');
-            }
-        });
-
-        // Seller Setup
-        document.getElementById('sellerSetupForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const itemName = document.getElementById('itemName').value;
-            const itemPrice = document.getElementById('itemPrice').value;
-            
-            closeSellerSetup();
-            
-            // Create room in Firebase
-            const roomRef = ref(db, `rooms/${currentRoom.code}`);
-            await set(roomRef, {
-                seller: {
-                    name: currentUser.name,
-                    id: currentUser.id,
-                    online: true,
-                    joinedAt: Date.now()
-                },
-                escrow: {
-                    status: 'waiting_buyer',
-                    item: itemName,
-                    price: parseInt(itemPrice),
+                await set(roomRef, {
+                    seller: { name: myName, id: myId, online: true, joinedAt: Date.now() },
+                    escrow: { status: 'waiting_buyer', item: item, price: price, createdAt: Date.now() },
                     createdAt: Date.now()
-                },
-                createdAt: Date.now()
-            });
+                });
 
-            // Setup disconnect cleanup
-            onDisconnect(ref(db, `rooms/${currentRoom.code}/seller/online`)).set(false);
-            
-            showPage(waitingPage);
-            document.getElementById('waitingCode').textContent = currentRoom.code;
-            document.getElementById('waitingRole').textContent = 'Seller';
-            
-            listenForOpponent(currentRoom.code, 'buyer');
-        });
+                // Disconnect handler
+                onDisconnect(ref(db, `rooms/${roomCode}/seller/online`)).set(false);
 
-        function closeSellerSetup() {
-            sellerSetupModal.classList.add('hidden');
-            sellerSetupModal.classList.remove('flex');
-        }
-        window.closeSellerSetup = closeSellerSetup;
+                document.getElementById('displayCode').textContent = roomCode;
+                showPage('pageWaiting');
 
-        // Join Room (Buyer)
-        async function joinRoom(code, role) {
-            const roomRef = ref(db, `rooms/${code}`);
-            const snapshot = await get(roomRef);
-            
-            if (!snapshot.exists()) {
-                alert('Room tidak ditemukan! Pastikan kode benar.');
-                return;
+                // Listen buyer join
+                unsubRoom = onValue(ref(db, `rooms/${roomCode}/buyer`), (snap) => {
+                    if (snap.exists()) {
+                        enterChat();
+                    } else {
+                        document.getElementById('waitingBuyerStatus').innerHTML = '<i class="fas fa-circle text-[8px] mr-1"></i>Menunggu...';
+                        document.getElementById('waitingBuyerStatus').className = 'text-slate-400 text-sm';
+                    }
+                });
+
+            } catch (err) {
+                console.error(err);
+                alert('Gagal buat room: ' + err.message);
             }
+        }
 
-            const roomData = snapshot.val();
-            
-            if (role === 'buyer') {
-                if (roomData.buyer) {
-                    alert('Room sudah memiliki Buyer!');
-                    return;
-                }
+        // --- BUYER: GABUNG ROOM ---
+        window.handleJoin = async function(e) {
+            e.preventDefault();
+            roomCode = document.getElementById('joinCode').value.trim();
+
+            if (roomCode.length !== 4) { alert('Kode harus 4 digit!'); return; }
+
+            try {
+                const roomRef = ref(db, 'rooms/' + roomCode);
+                const snap = await get(roomRef);
+
+                if (!snap.exists()) { alert('Room tidak ditemukan! Pastikan kode benar.'); return; }
                 
+                const data = snap.val();
+                if (data.buyer) { alert('Room sudah penuh (sudah ada buyer)!'); return; }
+
                 await update(roomRef, {
-                    buyer: {
-                        name: currentUser.name,
-                        id: currentUser.id,
-                        online: true,
-                        joinedAt: Date.now()
-                    },
+                    buyer: { name: myName, id: myId, online: true, joinedAt: Date.now() },
                     'escrow/status': 'negotiating'
                 });
 
-                onDisconnect(ref(db, `rooms/${code}/buyer/online`)).set(false);
-                
-                currentRoom = { code, ...roomData, buyer: currentUser };
-                enterChat(code);
+                onDisconnect(ref(db, `rooms/${roomCode}/buyer/online`)).set(false);
+                enterChat();
+
+            } catch (err) {
+                console.error(err);
+                alert('Gagal gabung: ' + err.message);
+            }
+        }
+             // --- CANCEL / LEAVE ---
+        window.cancelRoom = async function() {
+            if (confirm('Yakin batalkan room?')) {
+                if (unsubRoom) unsubRoom();
+                if (unsubMsg) unsubMsg();
+                try {
+                    await remove(ref(db, 'rooms/' + roomCode));
+                } catch(e) { console.log(e); }
+                showPage('pageLanding');
+                location.reload();
             }
         }
 
-        // Listen for opponent (Seller waiting)
-        function listenForOpponent(code, waitingFor) {
-            const opponentRef = ref(db, `rooms/${code}/${waitingFor === 'buyer' ? 'buyer' : 'seller'}`);
+        window.leaveChat = async function() {
+            if (!confirm('Yakin keluar dari room?')) return;
+            if (unsubRoom) unsubRoom();
+            if (unsubMsg) unsubMsg();
             
-            roomListe
+            try {
+                await set(ref(db, `rooms/${roomCode}/${myRole}/online`), false);
+            } catch(e) { console.log(e); }
+            
+            showPage('pageLanding');
+            location.reload();
+        }
+
+        // --- MASUK CHAT ---
+        window.enterChat = function() {
+            if (unsubRoom) unsubRoom();
+            showPage('pageChat');
+            document.getElementById('chatCode').textContent = roomCode;
+            document.getElementById('badgeRole').textContent = myRole.toUpperCase();
+            
+            if (myRole === 'seller') {
+                document.getElementById('badgeRole').className = 'px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px] uppercase';
+            } else {
+                document.getElementById('badgeRole').className = 'px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold text-[10px] uppercase';
+            }
+
+            // Listen room data (escrow + online status lawan)
+            unsubRoom = onValue(ref(db, `rooms/${roomCode}`), (snap) => {
+                const data = snap.val();
+                if (!data) return;
+                
+                updateEscrowUI(data.escrow);
+                
+                // Status online lawan
+                const opponent = myRole === 'seller' ? data.buyer : data.seller;
+                const badge = document.getElementById('badgeOnline');
+                if (opponent && opponent.online) {
+                    badge.innerHTML = '<i class="fas fa-circle text-[8px] mr-1"></i>Lawan Online';
+                    badge.className = 'text-emerald-500 font-medium';
+                } else {
+                    badge.innerHTML = '<i class="fas fa-circle text-[8px] mr-1"></i>Lawan Offline';
+                    badge.className = 'text-slate-400 font-medium';
+                }
+            });
+
+            // Listen messages realtime
+            unsubMsg = onValue(ref(db, `rooms/${roomCode}/messages`), (snap) => {
+                renderMessages(snap.val());
+            });
+
+            // Tandai diri sendiri online
+            set(ref(db, `rooms/${roomCode}/${myRole}/online`), true);
+        }
+
+        // --- UPDATE ESCROW UI ---
+        function updateEscrowUI(escrow) {
+            if (!escrow) return;
+            
+            const map = {
+                'waiting_buyer': { t: 'Menunggu Buyer', c: 'bg-yellow-100 text-yellow-700', p: 10 },
+                'negotiating':   { t: 'Negosiasi', c: 'bg-blue-100 text-blue-700', p: 25 },
+                'paid':          { t: 'Buyer Sudah Bayar', c: 'bg-purple-100 text-purple-700', p: 50 },
+                'shipped':       { t: 'Seller Sudah Kirim', c: 'bg-indigo-100 text-indigo-700', p: 75 },
+                'received':      { t: 'Buyer Terima Barang', c: 'bg-orange-100 text-orange-700', p: 90 },
+                'completed':     { t: 'Transaksi Selesai ✅', c: 'bg-emerald-100 text-emerald-700', p: 100 },
+                'disputed':      { t: 'Komplain ⚠️', c: 'bg-red-100 text-red-700', p: 0 }
+            };
+            
+            const s = map[escrow.status] || map['waiting_buyer'];
+            document.getElementById('escrowBadge').textContent = s.t;
+            document.getElementById('escrowBadge').className = `text-xs font-bold px-3 py-1 rounded-full ${s.c}`;
+            document.getElementById('escrowBar').style.width = s.p + '%';
+            
+            if (escrow.status === 'disputed') {
+                document.getElementById('escrowBar').className = 'h-full transition-all duration-700 bg-red-500';
+            } else if (escrow.status === 'completed') {
+                document.getElementById('escrowBar').className = 'h-full transition-all duration-700 bg-emerald-500';
+            } else {
+                document.getElementById('escrowBar').className = 'h-full transition-all duration-700 bg-blue-500';
+            }
+
+            if (escrow.item) document.getElementById('infoItem').textContent = escrow.item;
+            if (escrow.price) document.getElementById('infoPrice').textContent = 'Rp ' + escrow.price.toLocaleString('id-ID');
+
+            // Tombol aksi sesuai role & status
+            const box = document.getElementById('escrowButtons');
+            box.innerHTML = '';
+            const st = escrow.status;
+
+            if (st === 'negotiating' && myRole === 'buyer') {
+                box.innerHTML = `<button onclick="setEscrow('paid')" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-md transition-all"><i class="fas fa-money-bill-wave mr-1"></i>Saya Sudah Bayar</button>`;
+            }
+            else if (st === 'paid' && myRole === 'seller') {
+                box.innerHTML = `<button onclick="setEscrow('shipped')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-md transition-all"><i class="fas fa-shipping-fast mr-1"></i>Saya Sudah Kirim Barang</button>`;
+            }
+            else if (st === 'shipped' && myRole === 'buyer') {
+                box.innerHTML = `
+                    <button onclick="setEscrow('received')" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-md transition-all"><i class="fas fa-box-open mr-1"></i>Barang Diterima</button>
+                    <button onclick="setEscrow('disputed')" class="px-4 bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-md transition-all" title="Ajukan Komplain"><i class="fas fa-exclamation-triangle"></i></button>`;
+            }
+            else if (st === 'received' && myRole === 'seller') {
+                box.innerHTML = `<button onclick="setEscrow('completed')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-md transition-all"><i class="fas fa-check-double mr-1"></i>Selesaikan & Release Dana</button>`;
+            }
+        }
+
+        // --- UBAH STATUS ESCROW ---
+        window.setEscrow = async function(status) {
+            const labels = {
+                paid: '💰 Buyer mengkonfirmasi pembayaran',
+                shipped: '📦 Seller mengkonfirmasi pengiriman barang',
+                received: '✅ Buyer mengkonfirmasi barang diterima dalam kondisi baik',
+                completed: '🎉 Transaksi SELESAI — Rekber berhasil! Dana akan diteruskan ke Seller.',
+                disputed: '⚠️ Buyer mengajukan komplain. Admin akan segera meninjau.'
+            };
+            
+            try {
+                await update(ref(db, `rooms/${roomCode}`), {
+                    'escrow/status': status,
+                    'escrow/updatedAt': Date.now()
+                });
+                
+                await push(ref(db, `rooms/${roomCode}/messages`), {
+                    text: labels[status],
+                    type: 'system',
+                    timestamp: Date.now()
+                });
+            } catch(e) { 
+                alert('Error update status: ' + e.message); 
+            }
+        }
+
+        // --- RENDER PESAN ---
+        function renderMessages(messages) {
+            const box = document.getElementById('chatMessages');
+            
+            if (!messages) {
+                box.innerHTML = `<div class="text-center py-10 text-slate-400"><i class="fas fa-comments text-4xl mb-3 opacity-20"></i><p class="text-sm">Belum ada pesan. Mulai chat sekarang!</p></div>`;
+                return;
+            }
+            
+            box.innerHTML = '';
+            
+            // Urutkan berdasarkan timestamp
+            const entries = Object.entries(messages).sort((a, b) => a[1].timestamp - b[1].timestamp);
+            
+            entries.forEach(([key, m]) => {
+                if (m.type === 'system') {
+                    box.innerHTML += `
+                        <div class="flex justify-center my-2">
+                            <span class="bg-slate-100 text-slate-500 text-xs px-4 py-1.5 rounded-full border border-slate-200">${escapeHtml(m.text)}</span>
+                        </div>`;
+                } else {
+                    const isMe = m.senderId === myId;
+                    const time = new Date(m.timestamp).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+                    
+                    let bubbleClass = isMe 
+                        ? 'bg-blue-600 text-white rounded-2xl rounded-br-md' 
+                        : 'bg-white border border-slate-200 text-slate-700 rounded-2xl rounded-bl-md';
+                    
+                    let roleColor = m.role === 'seller' ? 'text-emerald-300' : 'text-blue-300';
+                    let nameColor = isMe ? 'text-blue-100' : 'text-slate-500';
+                    
+                    box.innerHTML += `
+                        <div class="flex ${isMe ? 'justify-end' : 'justify-start'} mb-3 animate-fade">
+                            <div class="max-w-[80%] ${bubbleClass} px-4 py-2.5 shadow-sm">
+                                <div class="text-[10px] ${nameColor} mb-0.5 flex items-center gap-1.5 font-semibold">
+                                    ${escapeHtml(m.senderName)}
+                                    <span class="${roleColor} opacity-80">(${m.role})</span>
+                                </div>
+                                <div class="text-sm leading-relaxed break-words">${escapeHtml(m.text)}</div>
+                                <div class="text-[10px] ${isMe ? 'text-blue-200' : 'text-slate-400'} mt-1 text-right opacity-70">${time}</div>
+                            </div>
+                        </div>`;
+                }
+            });
+            
+            // Auto scroll ke bawah
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // --- KIRIM PESAN ---
+        window.sendMessage = async function(e) {
+            e.preventDefault();
+            const input = document.getElementById('inputMsg');
+            const text = input.value.trim();
+            if (!text || !roomCode) return;
+            
+            try {
+                await push(ref(db, `rooms/${roomCode}/messages`), {
+                    text: text,
+                    senderId: myId,
+                    senderName: myName,
+                    role: myRole,
+                    timestamp: Date.now(),
+                    type: 'chat'
+                });
+                input.value = '';
+                input.focus();
+            } catch(err) { 
+                console.error('Send error:', err); 
+            }
+        }
+
+        // --- UTILS ---
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Generate random ID
+            myId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+        });
+
+    </script>
+</body>
+</html>
