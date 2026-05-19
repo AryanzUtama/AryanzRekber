@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prototype Rekber - Login & Chat</title>
+    <title>Prototype Rekber 4-Digit</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
     <style>
         :root {
             --primary: #4f46e5;
@@ -16,14 +19,14 @@
         
         .app-container { width: 100%; max-width: 450px; background: white; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; height: 85vh; }
         
-        /* LAYOUT 1: HALAMAN LOGIN / AKSES */
+        /* SCREEN 1: LOGIN */
         .auth-screen { padding: 30px 24px; display: flex; flex-direction: column; justify-content: center; height: 100%; gap: 20px; }
         .auth-screen h2 { text-align: center; color: var(--text-dark); font-size: 1.6rem; }
         .auth-screen p { text-align: center; color: #64748b; font-size: 0.9rem; margin-top: -10px; margin-bottom: 10px; }
         
         .form-group { display: flex; flex-direction: column; gap: 8px; }
         .form-group label { font-weight: 600; font-size: 0.85rem; color: #475569; }
-        .form-group input, .form-group select { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 0.95rem; }
+        .form-group input { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 0.95rem; }
         .form-group input:focus { border-color: var(--primary); }
         
         .divider { display: flex; align-items: center; text-align: center; color: #94a3b8; font-size: 0.8rem; margin: 10px 0; }
@@ -36,13 +39,13 @@
         .btn-secondary { background: #0f172a; }
         .btn-secondary:hover { background: #1e293b; }
 
-        /* LAYOUT 2: HALAMAN CHAT (TERSEMBUNYI DI AWAL) */
+        /* SCREEN 2: CHAT */
         .chat-screen { display: none; flex-direction: column; height: 100%; }
         .header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         .header h3 { font-size: 1.1rem; }
-        .header .room-badge { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; letter-spacing: 0.5px; }
+        .header .room-badge { background: rgba(255,255,255,0.3); padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; }
         
-        .user-info-bar { background: #1e293b; color: #94a3b8; padding: 6px 20px; font-size: 0.75rem; display: flex; justify-content: space-between; }
+        .user-info-bar { background: #1e293b; color: #94a3b8; padding: 6px 20px; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
         .user-info-bar span { color: #f8fafc; font-weight: bold; }
 
         .chat-box { flex: 1; padding: 20px; overflow-y: auto; background: var(--bg-light); display: flex; flex-direction: column; gap: 12px; }
@@ -66,7 +69,6 @@
 
 <div class="app-container">
     
-    <!-- ====== SCREEN 1: LOGIN & BUAT/MASUK KODE ====== -->
     <div class="auth-screen" id="authScreen">
         <div>
             <h2>Rekber Gate</h2>
@@ -75,28 +77,25 @@
 
         <div class="form-group">
             <label for="usernameInput">Nama Anda</label>
-            <input type="text" id="usernameInput" placeholder="Contoh: Budi (Buyer) / Andi (Seller)">
+            <input type="text" id="usernameInput" placeholder="Contoh: Budi atau Aryanz">
         </div>
 
-        <!-- Opsi A: Buat Room Baru -->
         <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-            <button class="btn" onclick="buatRoomBaru()">➕ Buat Kode Transaksi Baru</button>
+            <button class="btn" onclick="buatRoomBaru()">➕ Buat Kode Baru (4 Digit)</button>
             
             <div class="divider">ATAU MASUKKAN KODE EXISTING</div>
             
-            <!-- Opsi B: Masuk Room Yang Ada -->
             <div class="form-group">
-                <input type="text" id="joinRoomInput" placeholder="Masukkan Kode (Contoh: RKB-XXXX)" style="text-transform: uppercase;">
+                <input type="number" id="joinRoomInput" placeholder="Masukkan 4 Digit Kode (Contoh: 2308)" oninput="javascript: if (this.value.length > 4) this.value = this.value.slice(0, 4);">
             </div>
             <button class="btn btn-secondary" onclick="masukRoomExisting()">🚪 Masuk ke Room</button>
         </div>
     </div>
 
-    <!-- ====== SCREEN 2: ROOM CHAT ====== -->
     <div class="chat-screen" id="chatScreen">
         <div class="header">
             <h3>Sistem Rekber</h3>
-            <span class="room-badge" id="roomBadgeDisplay">RKB-XXXX</span>
+            <span class="room-badge" id="roomBadgeDisplay">0000</span>
         </div>
         <div class="user-info-bar">
             <div>Terhubung sebagai: <span id="myRoleDisplay">-</span></div>
@@ -107,17 +106,14 @@
 
         <div class="input-area">
             <input type="text" id="messageInput" placeholder="Ketik pesan..." autocomplete="off">
-            <button id="sendBtn">Kirim</button>
+            <button id="sendBtn" onclick="eksekusiKirim()">Kirim</button>
         </div>
     </div>
 
 </div>
 
-<!-- Firebase SDK Modern -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-
+<script>
+    // Konfigurasi Firebase Proyek Anda
     const firebaseConfig = {
         apiKey: "AIzaSyDpQhIcitZwMMhQIHhpB9rp_k0EpBJT-2k",
         authDomain: "chat-real-time-32576.firebaseapp.com",
@@ -129,34 +125,36 @@
         measurementId: "G-1P5RWQ46T0"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    // Inisialisasi Firebase v8
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-    // KREDENSIAL TELEGRAM
+    // KREDENSIAL TELEGRAM (Opsional)
     const TELEGRAM_TOKEN = "MASUKKAN_TOKEN_BOT_TELEGRAM_ANDA"; 
     const TELEGRAM_CHAT_ID = "MASUKKAN_CHAT_ID_TELEGRAM_ANDA"; 
 
-    // Variabel Sesi
     let MY_NAME = "";
     let ROOM_ID = "";
     let chatRef = null;
 
-    // Fungsi Pembantu: Mengonfirmasi pergantian layar ke Kamar Chat
     function aktifkanKamarChat(roomCode, namaUser) {
-        ROOM_ID = roomCode.toUpperCase();
+        ROOM_ID = roomCode.toString();
         MY_NAME = namaUser;
 
-        // Ubah Tampilan UI
+        // Pindah Layar
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('chatScreen').style.display = 'flex';
         document.getElementById('roomBadgeDisplay').innerText = ROOM_ID;
         document.getElementById('myRoleDisplay').innerText = MY_NAME;
 
-        // Hubungkan Referensi ke Firebase Database sesuai Kode Room
-        chatRef = ref(db, 'chats/' + ROOM_ID);
+        // Membuat referensi database langsung ke ruangan 4 digit
+        chatRef = database.ref('chats/' + ROOM_ID);
 
-        // Mulai dengarkan pesan masuk secara real-time
-        onChildAdded(chatRef, (snapshot) => {
+        // Hapus penampung chat sebelumnya agar bersih
+        document.getElementById('chatBox').innerHTML = '';
+
+        // JAMINAN SINKRONISASI REAL-TIME: Mendengarkan database v8
+        chatRef.on('child_added', (snapshot) => {
             const data = snapshot.val();
             const isMe = data.sender === MY_NAME;
             
@@ -166,68 +164,71 @@
                     <div class="text">${data.text}</div>
                 </div>
             `;
-            document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+            // Otomatis gulir ke pesan paling bawah
+            const chatBox = document.getElementById('chatBox');
+            chatBox.scrollTop = chatBox.scrollHeight;
         });
     }
 
-    // ACTION OPSI A: BUAT ROOM BARU (BIASANYA OLEH BUYER)
+    // Fungsi Membuat Room Baru dengan Kode 4 Digit Acak (1000 - 9999)
     window.buatRoomBaru = function() {
         const nama = document.getElementById('usernameInput').value.trim();
         if(!nama) { alert("Isi nama Anda terlebih dahulu!"); return; }
 
-        // Bikin kode acak sederhana contoh: RKB-7482
-        const kodeAcak = "RKB-" + Math.floor(1000 + Math.random() * 9000);
+        const kode4Digit = Math.floor(1000 + Math.random() * 9000);
         
-        aktifkanKamarChat(kodeAcak, nama);
-        alert(`Kode Room Berhasil Dibuat: ${kodeAcak}\nBerikan kode ini ke Seller/Admin agar mereka bisa masuk.`);
+        aktifkanKamarChat(kode4Digit, nama);
+        alert(`Kode Room 4-Digit Berhasil Dibuat: ${kode4Digit}\nBerikan kode angka ini ke rekan transaksi Anda.`);
     }
 
-    // ACTION OPSI B: MASUK ROOM EXISTING (OLEH SELLER / ADMIN)
+    // Fungsi Masuk Room Menggunakan Kode 4 Digit yang Sudah Ada
     window.masukRoomExisting = function() {
         const nama = document.getElementById('usernameInput').value.trim();
         const kodeMsk = document.getElementById('joinRoomInput').value.trim();
 
         if(!nama) { alert("Isi nama Anda terlebih dahulu!"); return; }
-        if(!kodeMsk) { alert("Masukkan kode transaksi tujuan!"); return; }
+        if(!kodeMsk) { alert("Masukkan 4 digit kode tujuan!"); return; }
 
         aktifkanKamarChat(kodeMsk, nama);
     }
 
-    // NOTIFIKASI TELEGRAM
-    function kirimNotifTelegram(pengirim, teks) {
-        if (TELEGRAM_TOKEN.includes("MASUKKAN")) return;
-        const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
-        fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                text: `🔔 *[ROOM: ${ROOM_ID}]*\n👤 *${pengirim}*: ${teks}`,
-                parse_mode: "Markdown"
-            })
-        }).catch(err => console.error(err));
-    }
-
-    // FUNGSI KIRIM CHAT
-    function eksekusiKirim() {
+    // Fungsi Kirim Pesan ke Firebase
+    window.eksekusiKirim = function() {
         const inputEl = document.getElementById('messageInput');
         const msg = inputEl.value.trim();
         
         if (msg !== "" && chatRef !== null) {
-            push(chatRef, {
+            chatRef.push({
                 sender: MY_NAME,
                 text: msg,
                 timestamp: Date.now()
             });
 
-            kirimNotifTelegram(MY_NAME, msg);
+            // Kirim ke Telegram jika token sudah diisi
+            if (!TELEGRAM_TOKEN.includes("MASUKKAN")) {
+                const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+                fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: `🔔 *[ROOM: ${ROOM_ID}]*\n👤 *${MY_NAME}*: ${msg}`,
+                        parse_mode: "Markdown"
+                    })
+                }).catch(err => console.error(err));
+            }
+
             inputEl.value = '';
             inputEl.focus();
         }
     }
 
-    document.getElementById('sendBtn').onclick = eksekusiKirim;
-    document.getElementById('messageInput').onkeypress = function(e) { if (e.key === 'Enter') eksekusiKirim(); };
+    // Deteksi tombol Enter pada keyboard untuk mengirim pesan
+    document.getElementById('messageInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            eksekusiKirim();
+        }
+    });
 </script>
 
 </body>
