@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[PROTOTYPE] Chat Rekber Real-Time</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --pembeli: #0284c7;
+            --penjual: #16a34a;
+            --admin: #dc2626;
+            --bg-light: #f1f5f9;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #e2e8f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        .app-container { width: 100%; max-width: 450px; background: white; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; height: 85vh; }
+        
+        /* Header & Info Room */
+        .header { background: var(--primary); color: white; padding: 15px 20px; text-align: center; position: relative; }
+        .header h2 { font-size: 1.2rem; margin-bottom: 4px; }
+        .header p { font-size: 0.85rem; opacity: 0.9; }
+        
+        /* Simulator Role Switcher (Sangat berguna untuk Demo/Prototype) */
+        .role-switcher { background: #1e293b; padding: 10px; display: flex; justify-content: space-around; font-size: 0.8rem; }
+        .role-btn { border: none; padding: 6px 12px; border-radius: 20px; color: white; cursor: pointer; opacity: 0.6; font-weight: bold; transition: 0.3s; }
+        .role-btn.active { opacity: 1; transform: scale(1.05); }
+        #btn-pembeli { background: var(--pembeli); }
+        #btn-penjual { background: var(--penjual); }
+        #btn-admin { background: var(--admin); }
+
+        /* Chat Area */
+        .chat-box { flex: 1; padding: 20px; overflow-y: auto; background: var(--bg-light); display: flex; flex-direction: column; gap: 12px; }
+        
+        /* Bubble Chat Style */
+        .message { max-width: 80%; padding: 10px 14px; border-radius: 12px; position: relative; line-height: 1.4; font-size: 0.95rem; display: flex; flex-direction: column; }
+        .message .meta { font-size: 0.75rem; font-weight: bold; margin-bottom: 4px; }
+        .message .text { color: #1e293b; word-break: break-word; }
+        
+        /* Dinamis warna bubble berdasarkan Pengirim */
+        .msg-pembeli { background: #e0f2fe; align-self: flex-start; border-left: 4px solid var(--pembeli); }
+        .msg-pembeli .meta { color: var(--pembeli); }
+        
+        .msg-penjual { background: #dcfce7; align-self: flex-start; border-left: 4px solid var(--penjual); }
+        .msg-penjual .meta { color: var(--penjual); }
+        
+        .msg-admin { background: #fee2e2; align-self: center; text-align: center; border: 1px solid #fca5a5; width: 90%; }
+        .msg-admin .meta { color: var(--admin); }
+        
+        /* Input Area */
+        .input-area { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid #e2e8f0; }
+        .input-area input { flex: 1; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 0.95rem; transition: 0.2s; }
+        .input-area input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        .input-area button { background: var(--primary); color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .input-area button:hover { background: #4338ca; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Header -->
+    <div class="header">
+        <h2>Sistem Chat Rekber</h2>
+        <p>ID Transaksi: <span id="room-display">Loading...</span></p>
+    </div>
+
+    <!-- Simulator Role (Klik untuk ganti peran saat ngetes) -->
+    <div class="role-switcher">
+        <span style="color: #94a3b8; font-size: 0.8rem; align-self: center;">Mode Testing:</span>
+        <button class="role-btn active" id="btn-pembeli" onclick="setRole('Pembeli')">Pembeli</button>
+        <button class="role-btn" id="btn-penjual" onclick="setRole('Penjual')">Penjual</button>
+        <button class="role-btn" id="btn-admin" onclick="setRole('Admin')">Admin</button>
+    </div>
+
+    <!-- Kotak Pesan -->
+    <div class="chat-box" id="chatBox">
+        <!-- Pesan otomatis masuk di sini lewat JS -->
+    </div>
+
+    <!-- Input Form -->
+    <div class="input-area">
+        <input type="text" id="messageInput" placeholder="Ketik pesan di sini..." autocomplete="off">
+        <button id="sendBtn">Kirim</button>
+    </div>
+</div>
+
+<!-- Firebase SDK Modern -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+    // Konfigurasi Firebase Anda yang sudah aktif
+    const firebaseConfig = {
+        apiKey: "AIzaSyDpQhIcitZwMMhQIHhpB9rp_k0EpBJT-2k",
+        authDomain: "chat-real-time-32576.firebaseapp.com",
+        databaseURL: "https://chat-real-time-32576-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "chat-real-time-32576",
+        storageBucket: "chat-real-time-32576.firebasestorage.app",
+        messagingSenderId: "21431357525",
+        appId: "1:21431357525:web:31bd3c0a629e4e5d5e04dc",
+        measurementId: "G-1P5RWQ46T0"
+    };
+
+    // Inisialisasi Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // AMBIL KODE ROOM DARI URL KLO ADA (?room=TRX-101), KLO GA ADA DEFAULT KE TRX-999
+    const params = new URLSearchParams(window.location.search);
+    const roomId = params.get('room') || "TRX-999";
+    document.getElementById('room-display').innerText = roomId;
+
+    const chatRef = ref(db, 'chats/' + roomId);
+
+    // KREDENSIAL TELEGRAM (GANTI DENGAN MILIK ANDA)
+    const TELEGRAM_TOKEN = "MASUKKAN_TOKEN_BOT_TELEGRAM_ANDA"; 
+    const TELEGRAM_CHAT_ID = "MASUKKAN_CHAT_ID_TELEGRAM_ANDA"; 
+
+    // Variabel Global Role Default (Bisa diganti lewat tombol switcher di atas)
+    window.currentRole = "Pembeli"; 
+    window.setRole = function(role) {
+        window.currentRole = role;
+        document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+        if(role === 'Pembeli') document.getElementById('btn-pembeli').classList.add('active');
+        if(role === 'Penjual') document.getElementById('btn-penjual').classList.add('active');
+        if(role === 'Admin') document.getElementById('btn-admin').classList.add('active');
+    }
+
+    // Sistem Notifikasi Telegram
+    function kirimNotifTelegram(peran, teks) {
+        if (8769093024:AAET7KkY2_FMkvnogux2k97fZl25Qbi8JB8.includes("MASUKKAN")) return; // Skip jika belum diisi
+        
+        const url = `https://api.telegram.org/bot${8769093024:AAET7KkY2_FMkvnogux2k97fZl25Qbi8JB8}/sendMessage`;
+        const pesanBot = `🔔 *[CHAT REKBER - ${roomId}]*\n👤 *${peran}*: ${teks}`;
+        
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                chat_id: 7129085772,
+                text: pesanBot,
+                parse_mode: "Markdown"
+            })
+        }).catch(err => console.error("Gagal kirim Telegram:", err));
+    }
+
+    // Trigger Kirim Pesan
+    const inputEl = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    function eksekusiKirim() {
+        const msg = inputEl.value.trim();
+        if (msg !== "") {
+            // Push ke Firebase
+            push(chatRef, {
+                sender: window.currentRole,
+                text: msg,
+                timestamp: Date.now()
+            });
+
+            // Jalankan Notifikasi Telegram
+            kirimNotifTelegram(window.currentRole, msg);
+
+            inputEl.value = '';
+            inputEl.focus();
+        }
+    }
+
+    sendBtn.onclick = eksekusiKirim;
+    inputEl.onkeypress = function(e) { if (e.key === 'Enter') eksekusiKirim(); };
+
+    // Mendengarkan Database & Menampilkan Chat (Real-time)
+    const chatBox = document.getElementById('chatBox');
+    onChildAdded(chatRef, (snapshot) => {
+        const data = snapshot.val();
+        let classRole = "msg-pembeli"; // default
+        
+        if (data.sender === "Penjual") classRole = "msg-penjual";
+        if (data.sender === "Admin") classRole = "msg-admin";
+
+        chatBox.innerHTML += `
+            <div class="message ${classRole}">
+                <div class="meta">${data.sender}</div>
+                <div class="text">${data.text}</div>
+            </div>
+        `;
+        // Auto scroll kebawah
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+</script>
+
+</body>
+</html>
+
