@@ -22,8 +22,8 @@ from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
 
 # ================== KONFIGURASI (WAJIB DIISI) ==================
-BOT_TOKEN = "ISI_TOKEN_DARI_BOTFATHER"
-OWNER_ID = 0  # isi dengan Telegram user ID kamu (angka, bukan username)
+BOT_TOKEN = "9106994623:AAHcVel5Cvhuo7opKp_Ez8fXZ9ArqG9euYw"
+OWNER_ID = 7129085772
 
 # Endpoint Moonton. PENTING: verifikasi dulu dengan curl sebelum dipakai,
 # karena endpoint bisa berubah. Lihat README untuk cara ujinya.
